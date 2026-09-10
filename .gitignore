@@ -1,3 +1,4 @@
-preview/
+preview/*.html
 helo-smtp-*.zip
+docs/*.orig
 .DS_Store
