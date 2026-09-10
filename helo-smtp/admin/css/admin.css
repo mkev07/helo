@@ -1,0 +1,838 @@
+/**
+ * Admin styling.
+ *
+ * Card/badge/switch shapes borrowed from shadcn, colours and controls kept in
+ * WordPress's palette. Buttons deliberately reuse core .button classes so they
+ * follow whatever admin colour scheme the user picked.
+ *
+ * @package Helo
+ */
+
+.helo-app {
+	--helo-fg: #1d2327;
+	--helo-muted: #646970;
+	--helo-border: #e2e2e5;
+	--helo-border-strong: #c3c4c7;
+	--helo-surface: #fff;
+	--helo-subtle: #f6f7f7;
+	--helo-accent: #2271b1;
+	--helo-ok: #007a1f;
+	--helo-err: #b32d2e;
+	--helo-radius: 8px;
+	--helo-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 1px 3px rgba(0, 0, 0, .05);
+
+	max-width: 1400px;
+	margin-right: 20px;
+	color: var(--helo-fg);
+}
+
+.helo-app *,
+.helo-app *::before,
+.helo-app *::after {
+	box-sizing: border-box;
+}
+
+/* ----------------------------------------------------------------- header */
+
+.helo-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin: 8px 0 20px;
+}
+
+.helo-head h1 {
+	margin: 0 0 4px;
+	padding: 0;
+	font-size: 23px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.helo-head p {
+	margin: 0;
+	color: var(--helo-muted);
+	font-size: 13px;
+}
+
+/* ------------------------------------------------------------------- tabs */
+
+.helo-tabs {
+	display: inline-flex;
+	gap: 2px;
+	padding: 3px;
+	margin: 0 0 20px;
+	background: #f0f0f1;
+	border-radius: var(--helo-radius);
+}
+
+.helo-tabs a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 14px;
+	border-radius: 6px;
+	color: var(--helo-muted);
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	transition: background .12s, color .12s;
+}
+
+.helo-tabs a:hover {
+	color: var(--helo-fg);
+}
+
+.helo-tabs a[aria-current="page"] {
+	background: var(--helo-surface);
+	color: var(--helo-fg);
+	font-weight: 600;
+	box-shadow: var(--helo-shadow);
+}
+
+.helo-tabs a:focus-visible {
+	outline: 2px solid var(--helo-accent);
+	outline-offset: 1px;
+}
+
+.helo-tabs .helo-count {
+	padding: 0 6px;
+	border-radius: 999px;
+	background: #dcdcde;
+	color: #50575e;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 17px;
+}
+
+/* ------------------------------------------------------------------ cards */
+
+.helo-card {
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-border);
+	border-radius: var(--helo-radius);
+	box-shadow: var(--helo-shadow);
+	margin-bottom: 20px;
+	overflow: hidden;
+}
+
+.helo-card__head {
+	padding: 18px 24px;
+	border-bottom: 1px solid var(--helo-border);
+}
+
+.helo-card__head--split {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.helo-card__head h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.helo-card__head p {
+	margin: 4px 0 0;
+	color: var(--helo-muted);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.helo-card__foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 14px 24px;
+	background: var(--helo-subtle);
+	border-top: 1px solid var(--helo-border);
+}
+
+.helo-card__foot p {
+	margin: 0;
+	color: var(--helo-muted);
+	font-size: 12px;
+}
+
+/* ----------------------------------------------------------------- fields */
+
+.helo-field {
+	display: grid;
+	grid-template-columns: 210px minmax(0, 1fr);
+	gap: 4px 20px;
+	padding: 16px 24px;
+	border-top: 1px solid var(--helo-border);
+}
+
+.helo-card__head + .helo-field,
+.helo-card > form > .helo-field:first-child,
+.helo-field:first-child {
+	border-top: 0;
+}
+
+.helo-field > label:first-child,
+.helo-field__label {
+	padding-top: 7px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.helo-field__control {
+	min-width: 0;
+}
+
+.helo-hint {
+	margin: 6px 0 0;
+	color: var(--helo-muted);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.helo-hint code {
+	padding: 2px 6px;
+	background: var(--helo-subtle);
+	border: 1px solid var(--helo-border);
+	border-radius: 4px;
+	font-size: 11px;
+}
+
+.helo-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+@media screen and (max-width: 782px) {
+	.helo-field {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.helo-field > label:first-child,
+	.helo-field__label {
+		padding-top: 0;
+	}
+}
+
+/* --------------------------------------------------------------- controls */
+
+.helo-app input[type="text"],
+.helo-app input[type="email"],
+.helo-app input[type="number"],
+.helo-app input[type="password"],
+.helo-app input[type="search"],
+.helo-app select {
+	min-height: 34px;
+	padding: 4px 10px;
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-border-strong);
+	border-radius: 6px;
+	box-shadow: none;
+	color: var(--helo-fg);
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.helo-app input[type="text"],
+.helo-app input[type="email"],
+.helo-app input[type="password"],
+.helo-app select {
+	width: 100%;
+	max-width: 380px;
+}
+
+.helo-app input[type="number"] {
+	width: 90px;
+}
+
+.helo-app input:focus,
+.helo-app select:focus {
+	border-color: var(--helo-accent);
+	box-shadow: 0 0 0 3px rgba(34, 113, 177, .16);
+	outline: none;
+}
+
+.helo-app input::placeholder {
+	color: #a7aaad;
+}
+
+/* Toggle switch, built on a real checkbox so the form still posts normally. */
+
+.helo-switch {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+	line-height: 1.5;
+	cursor: pointer;
+}
+
+.helo-switch input[type="checkbox"] {
+	appearance: none;
+	-webkit-appearance: none;
+	position: relative;
+	flex: none;
+	width: 36px;
+	height: 20px;
+	margin: 0;
+	padding: 0;
+	background: var(--helo-border-strong);
+	border: 0;
+	border-radius: 999px;
+	box-shadow: none;
+	transition: background .15s ease;
+	cursor: pointer;
+}
+
+.helo-switch input[type="checkbox"]::before {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	background: #fff;
+	border-radius: 50%;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+	transition: transform .15s ease;
+}
+
+.helo-switch input[type="checkbox"]:checked {
+	background: var(--helo-accent);
+}
+
+.helo-switch input[type="checkbox"]:checked::before {
+	transform: translateX(16px);
+}
+
+.helo-switch input[type="checkbox"]:focus-visible {
+	outline: 2px solid var(--helo-accent);
+	outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- summary */
+
+.helo-summary {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	margin-bottom: 20px;
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-border);
+	border-radius: var(--helo-radius);
+	box-shadow: var(--helo-shadow);
+	overflow: hidden;
+}
+
+.helo-summary__cell {
+	padding: 16px 20px;
+	border-left: 1px solid var(--helo-border);
+}
+
+.helo-summary__cell:first-child {
+	border-left: 0;
+}
+
+.helo-summary__label {
+	display: block;
+	margin-bottom: 6px;
+	color: var(--helo-muted);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.helo-summary__value {
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+	word-break: break-word;
+}
+
+.helo-summary__value small {
+	color: var(--helo-muted);
+	font-weight: 400;
+}
+
+/* ----------------------------------------------------------------- badges */
+
+.helo-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 2px 10px 2px 8px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 20px;
+	white-space: nowrap;
+}
+
+.helo-badge::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+.helo-badge--ok {
+	background: #edf7ee;
+	color: var(--helo-ok);
+	box-shadow: inset 0 0 0 1px #b5ddbd;
+}
+
+.helo-badge--err {
+	background: #fcf0f1;
+	color: var(--helo-err);
+	box-shadow: inset 0 0 0 1px #ecc2c3;
+}
+
+.helo-badge--muted {
+	background: var(--helo-subtle);
+	color: var(--helo-muted);
+	box-shadow: inset 0 0 0 1px var(--helo-border);
+}
+
+/* ------------------------------------------------- split (mail client) */
+
+.helo-split {
+	--helo-split-height: clamp(520px, calc(100vh - 300px), 940px);
+
+	display: grid;
+	grid-template-columns: 340px minmax(0, 1fr);
+}
+
+.helo-split__list {
+	height: var(--helo-split-height);
+	overflow-y: auto;
+	border-right: 1px solid var(--helo-border);
+	background: var(--helo-subtle);
+}
+
+.helo-split__pane {
+	height: var(--helo-split-height);
+	overflow-y: auto;
+	background: var(--helo-surface);
+}
+
+@media screen and (max-width: 960px) {
+	.helo-split {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.helo-split__list {
+		height: auto;
+		max-height: 340px;
+		border-right: 0;
+		border-bottom: 1px solid var(--helo-border);
+	}
+
+	.helo-split__pane {
+		height: auto;
+	}
+}
+
+/* ------------------------------------------------------------ message rows */
+
+.helo-msg {
+	display: block;
+	padding: 11px 16px 12px;
+	border-bottom: 1px solid var(--helo-border);
+	border-left: 3px solid transparent;
+	color: inherit;
+	text-decoration: none;
+}
+
+.helo-msg:hover {
+	background: #fff;
+	color: inherit;
+}
+
+.helo-msg[aria-current="true"] {
+	background: var(--helo-surface);
+	border-left-color: var(--helo-accent);
+}
+
+.helo-msg:focus-visible {
+	outline: 2px solid var(--helo-accent);
+	outline-offset: -2px;
+}
+
+.helo-msg__top {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.helo-msg__subject {
+	overflow: hidden;
+	font-size: 13px;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.helo-msg__time {
+	flex: none;
+	color: var(--helo-muted);
+	font-size: 11px;
+	white-space: nowrap;
+}
+
+.helo-msg__to {
+	display: block;
+	margin-top: 3px;
+	overflow: hidden;
+	color: var(--helo-muted);
+	font-size: 12px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.helo-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-right: 7px;
+	border-radius: 50%;
+	vertical-align: middle;
+}
+
+.helo-dot--ok {
+	background: #b5ddbd;
+}
+
+.helo-dot--err {
+	background: var(--helo-err);
+}
+
+/* ----------------------------------------------------------- reading pane */
+
+.helo-reader__head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+	padding: 18px 24px;
+	border-bottom: 1px solid var(--helo-border);
+}
+
+.helo-reader__title {
+	min-width: 0;
+}
+
+.helo-reader__head h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+	word-break: break-word;
+}
+
+.helo-reader__head p {
+	margin: 4px 0 0;
+	color: var(--helo-muted);
+	font-size: 12px;
+}
+
+.helo-mono {
+	font-family: Menlo, Consolas, monaco, monospace;
+	font-size: 12px;
+}
+
+/* ------------------------------------------------------------- empty state */
+
+.helo-empty {
+	padding: 56px 24px;
+	text-align: center;
+}
+
+.helo-empty .dashicons {
+	width: 40px;
+	height: 40px;
+	color: var(--helo-border-strong);
+	font-size: 40px;
+}
+
+.helo-empty h3 {
+	margin: 12px 0 4px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.helo-empty p {
+	margin: 0;
+	color: var(--helo-muted);
+	font-size: 13px;
+}
+
+/* -------------------------------------------------------------- toolbars */
+
+.helo-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+
+.helo-search {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.helo-search input[type="search"] {
+	width: 280px;
+}
+
+.helo-result-count {
+	color: var(--helo-muted);
+	font-size: 13px;
+}
+
+/* --------------------------------------------------------- message detail */
+
+.helo-meta {
+	display: grid;
+	grid-template-columns: 130px minmax(0, 1fr);
+}
+
+.helo-meta dt {
+	padding: 12px 0 12px 24px;
+	border-top: 1px solid var(--helo-border);
+	color: var(--helo-muted);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.helo-meta dd {
+	margin: 0;
+	padding: 12px 24px 12px 0;
+	border-top: 1px solid var(--helo-border);
+	font-size: 13px;
+	word-break: break-word;
+}
+
+.helo-meta dt:first-child,
+.helo-meta dt:first-child + dd {
+	border-top: 0;
+}
+
+.helo-meta pre {
+	margin: 0;
+	font-family: Menlo, Consolas, monaco, monospace;
+	font-size: 12px;
+	line-height: 1.6;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.helo-error-box {
+	margin: 8px 0 0;
+	padding: 10px 12px;
+	background: #fcf0f1;
+	border: 1px solid #ecc2c3;
+	border-radius: 6px;
+	color: var(--helo-err);
+	font-family: Menlo, Consolas, monaco, monospace;
+	font-size: 12px;
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+/* ---------------------------------------------------------------- preview */
+
+.helo-preview__bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 24px;
+	border-bottom: 1px solid var(--helo-border);
+	color: var(--helo-muted);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.helo-preview__stage {
+	padding: 24px;
+	background: repeating-conic-gradient(#f0f0f1 0% 25%, #f6f7f7 0% 50%) 50% / 16px 16px;
+}
+
+.helo-preview__frame {
+	width: 100%;
+	max-width: 100%;
+	height: 560px;
+	margin: 0 auto;
+	display: block;
+	background: #fff;
+	border: 1px solid var(--helo-border-strong);
+	border-radius: 6px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+	transition: max-width .2s ease;
+}
+
+/* Width switcher: pure CSS, the radios live just before the stage. */
+
+.helo-vis {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.helo-seg {
+	display: inline-flex;
+	padding: 3px;
+	background: #f0f0f1;
+	border-radius: 6px;
+}
+
+.helo-seg label {
+	padding: 4px 12px;
+	border-radius: 4px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+	user-select: none;
+}
+
+#helo-width-desktop:checked ~ .helo-preview .helo-seg label[for="helo-width-desktop"],
+#helo-width-mobile:checked ~ .helo-preview .helo-seg label[for="helo-width-mobile"] {
+	background: var(--helo-surface);
+	color: var(--helo-fg);
+	font-weight: 600;
+	box-shadow: var(--helo-shadow);
+}
+
+#helo-width-mobile:checked ~ .helo-preview .helo-preview__frame {
+	max-width: 390px;
+}
+
+/* The radios are visually hidden but still tabbable, so mirror focus onto the label. */
+#helo-width-desktop:focus-visible ~ .helo-preview .helo-seg label[for="helo-width-desktop"],
+#helo-width-mobile:focus-visible ~ .helo-preview .helo-seg label[for="helo-width-mobile"] {
+	outline: 2px solid var(--helo-accent);
+	outline-offset: 1px;
+}
+
+.helo-source {
+	border-top: 1px solid var(--helo-border);
+}
+
+.helo-source summary {
+	padding: 12px 24px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	list-style: none;
+}
+
+.helo-source summary::-webkit-details-marker {
+	display: none;
+}
+
+.helo-source summary::before {
+	content: "\25B8";
+	display: inline-block;
+	margin-right: 8px;
+	transition: transform .15s ease;
+}
+
+.helo-source[open] summary::before {
+	transform: rotate(90deg);
+}
+
+.helo-source pre {
+	max-height: 420px;
+	margin: 0;
+	padding: 0 24px 20px;
+	overflow: auto;
+	font-family: Menlo, Consolas, monaco, monospace;
+	font-size: 12px;
+	line-height: 1.6;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.helo-plain {
+	margin: 0;
+	padding: 24px;
+	font-family: Menlo, Consolas, monaco, monospace;
+	font-size: 13px;
+	line-height: 1.7;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+/* ------------------------------------------------------------- pagination */
+
+.helo-pagination {
+	display: flex;
+	justify-content: flex-end;
+	gap: 4px;
+	margin-top: 16px;
+}
+
+.helo-pagination .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 32px;
+	height: 32px;
+	padding: 0 8px;
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-border);
+	border-radius: 6px;
+	color: var(--helo-fg);
+	font-size: 13px;
+	text-decoration: none;
+}
+
+.helo-pagination .page-numbers:hover {
+	background: var(--helo-subtle);
+}
+
+.helo-pagination .page-numbers.current {
+	background: var(--helo-accent);
+	border-color: var(--helo-accent);
+	color: #fff;
+	font-weight: 600;
+}
+
+.helo-pagination .page-numbers.dots {
+	border-color: transparent;
+	background: none;
+}
+
+/* ---------------------------------------------------------------- notices */
+
+.helo-app > .notice {
+	margin: 0 0 20px;
+	border-radius: 6px;
+}
+
+.helo-pagination--list {
+	justify-content: center;
+	padding: 12px;
+	margin-top: 0;
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Helo — SMTP & Mail Log",
+  "version": "1.2.0",
+  "download_url": "https://YOUR-BUCKET.s3.eu-central-1.amazonaws.com/plugins/helo-smtp/helo-smtp-1.2.0.zip",
+  "homepage": "https://github.com/mkev07/helo",
+  "author": "<a href=\"https://vectorads.mu\">Kevin</a>",
+  "requires": "5.9",
+  "tested": "6.8",
+  "requires_php": "7.4",
+  "last_updated": "2026-09-10 16:48:28",
+  "sections": {
+    "description": "Sends all WordPress mail through your own SMTP server, logs every message, and lets you preview or resend it.",
+    "changelog": "<h4>1.2.0</h4><ul><li>Renamed to Helo, with a new menu icon.</li><li>Email log is now a two-pane mail client view.</li><li>Existing settings and logs are adopted automatically.</li></ul><h4>1.1.0</h4><ul><li>Redesigned admin screens.</li><li>Self-hosted updates.</li></ul><h4>1.0.0</h4><ul><li>First release.</li></ul>"
+  }
+}
