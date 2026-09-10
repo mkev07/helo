@@ -6,11 +6,12 @@
  * Version:           1.2.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
- * Author:            Kevin
+ * Author:            Kevin Mukoond
+ * Author URI:        https://vectorads.mu
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       helo-smtp
- * Update URI:        https://YOUR-BUCKET.s3.eu-central-1.amazonaws.com/plugins/helo-smtp/update.json
+ * Update URI:        https://github.com/mkev07/helo/releases/latest/download/update.json
  *
  * @package Helo
  */

@@ -1,48 +1,54 @@
 #!/usr/bin/env bash
-# Builds the release zip, syncs update.json, and optionally uploads both to S3.
+# Builds the release zip and publishes it as a GitHub release.
 #
-#   ./build.sh              build only
-#   ./build.sh --publish    build and upload
+#   ./build.sh              build and sync update.json
+#   ./build.sh --publish    build, then create the GitHub release
 #
-# The folder INSIDE the zip must stay "helo-smtp" — WordPress
-# installs an update into whatever folder the archive contains, so a mismatch
-# leaves you with two copies of the plugin. The zip's own filename is free,
-# which is why it carries the version.
+# The repo must be PUBLIC. WordPress fetches the manifest and the zip with no
+# credentials, and neither raw.githubusercontent.com nor a release asset on a
+# private repo will answer an unauthenticated request.
+#
+# The folder INSIDE the zip must stay "helo-smtp" — WordPress installs an
+# update into whatever folder the archive contains, so a mismatch leaves you
+# with two copies of the plugin. The zip's own filename is free, which is why
+# it carries the version.
 
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# --- configure once -------------------------------------------------------
-# Public HTTPS prefix the site will fetch from.
-BASE_URL="https://YOUR-BUCKET.s3.eu-central-1.amazonaws.com/plugins/helo-smtp"
-# Same location, as an s3:// URI, for uploads.
-S3_URI="s3://YOUR-BUCKET/plugins/helo-smtp"
-# Leave empty for AWS. For Hetzner/other S3-compatible, e.g.
-# https://fsn1.your-objectstorage.com
-S3_ENDPOINT=""
-# Add --acl public-read here if the bucket uses ACLs instead of a bucket policy.
-EXTRA_ARGS=()
-# --------------------------------------------------------------------------
-
+REPO="mkev07/helo"
 SLUG="helo-smtp"
-VERSION=$(grep -m1 "^ \* Version:" "$SLUG/$SLUG.php" | awk '{print $3}')
+
+MAIN="$SLUG/$SLUG.php"
+VERSION=$(grep -m1 "^ \* Version:" "$MAIN" | awk '{print $3}')
 ZIP="$SLUG-$VERSION.zip"
-MANIFEST_URL="$BASE_URL/update.json"
 
-# The plugin header decides which host WordPress polls. If it disagrees with
-# BASE_URL the update channel is silently dead, so fail loudly instead.
-HEADER_URI=$(grep -m1 "^ \* Update URI:" "$SLUG/$SLUG.php" | sed 's/^ \* Update URI:[[:space:]]*//')
-if [[ "$HEADER_URI" != "$MANIFEST_URL" ]]; then
-	echo "error: Update URI header does not match BASE_URL" >&2
-	echo "  header:   $HEADER_URI" >&2
-	echo "  expected: $MANIFEST_URL" >&2
-	exit 1
-fi
+MANIFEST_URL="https://github.com/$REPO/releases/latest/download/update.json"
+DOWNLOAD_URL="https://github.com/$REPO/releases/download/v$VERSION/$ZIP"
 
-rm -f "$SLUG"-*.zip "$SLUG.zip"
+die() { echo "error: $*" >&2; exit 1; }
+
+# --- guards ---------------------------------------------------------------
+
+# The version lives in three places and they must not drift: WordPress reads
+# the header, the plugin reads the constant, readme.txt is what humans read.
+CONSTANT=$(grep -m1 "define( 'HELO_VERSION'" "$MAIN" | sed -E "s/.*'([0-9][^']*)'.*/\1/")
+STABLE=$(grep -m1 "^Stable tag:" "$SLUG/readme.txt" | awk '{print $3}')
+
+[[ "$CONSTANT" == "$VERSION" ]] || die "HELO_VERSION is $CONSTANT but the header says $VERSION"
+[[ "$STABLE"   == "$VERSION" ]] || die "readme.txt Stable tag is $STABLE but the header says $VERSION"
+
+# The header decides which host WordPress polls. If it disagrees with REPO the
+# update channel is silently dead, so fail loudly instead.
+HEADER_URI=$(grep -m1 "^ \* Update URI:" "$MAIN" | sed 's/^ \* Update URI:[[:space:]]*//')
+[[ "$HEADER_URI" == "$MANIFEST_URL" ]] || die "Update URI header is $HEADER_URI, expected $MANIFEST_URL"
+
+# --- build ----------------------------------------------------------------
+
+rm -f "$SLUG"-*.zip
 zip -qr "$ZIP" "$SLUG" -x "*/tests/*" "*.DS_Store"
 
-python3 - "$VERSION" "$BASE_URL/$ZIP" <<'PY'
+python3 - "$VERSION" "$DOWNLOAD_URL" <<'PY'
 import datetime, json, sys
 
 version, url = sys.argv[1], sys.argv[2]
@@ -62,24 +68,25 @@ PY
 echo "built $ZIP"
 
 if [[ "${1:-}" != "--publish" ]]; then
-	echo "run ./build.sh --publish to upload"
+	echo "commit update.json, then run ./build.sh --publish"
 	exit 0
 fi
 
-endpoint=()
-[[ -n "$S3_ENDPOINT" ]] && endpoint=(--endpoint-url "$S3_ENDPOINT")
+# --- publish --------------------------------------------------------------
 
-# Versioned zips never change, so they cache forever. The manifest is the
-# thing that must go stale quickly, or a release takes a day to show up.
-aws "${endpoint[@]}" s3 cp "$ZIP" "$S3_URI/$ZIP" \
-	--content-type application/zip \
-	--cache-control "public, max-age=31536000, immutable" \
-	"${EXTRA_ARGS[@]}"
+# Release from committed code only, or the tag will not match what shipped.
+[[ -z "$(git status --porcelain)" ]] || die "working tree is dirty — commit update.json first"
+git diff --quiet @ @{u} 2>/dev/null || die "local commits not pushed — git push first"
 
-aws "${endpoint[@]}" s3 cp update.json "$S3_URI/update.json" \
-	--content-type application/json \
-	--cache-control "public, max-age=300" \
-	"${EXTRA_ARGS[@]}"
+gh release view "v$VERSION" --repo "$REPO" >/dev/null 2>&1 && die "release v$VERSION already exists"
 
-echo "published $VERSION"
-echo "verify: curl -s $MANIFEST_URL"
+# update.json rides along as an asset so /releases/latest/download/update.json
+# always resolves — publishing the release IS publishing the manifest.
+gh release create "v$VERSION" "$ZIP" update.json \
+	--repo "$REPO" \
+	--target main \
+	--title "v$VERSION" \
+	--generate-notes
+
+echo "published v$VERSION"
+echo "verify: curl -sL $MANIFEST_URL | head -5"

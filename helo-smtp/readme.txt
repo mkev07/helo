@@ -1,5 +1,5 @@
 === Helo — SMTP & Mail Log ===
-Contributors: kevin
+Contributors: Kevin Mukoond
 Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
@@ -46,65 +46,57 @@ Host `smtp.gmail.com`, port 587, TLS, and an App Password — not the account pa
 
 = How do updates work if this is not on wordpress.org? =
 
-The `Update URI` header in the main plugin file points at a JSON manifest you
-host yourself. WordPress polls it on its normal update schedule and shows the
-update on the Plugins screen like any other. See "Updates" below.
+The `Update URI` header points at the manifest attached to the latest GitHub
+release. WordPress polls it on its normal update schedule and shows the update
+on the Plugins screen like any other. See "Updates" below.
 
 == Updates ==
 
 Updates use the `Update URI` header and the `update_plugins_{$hostname}` filter
 that WordPress 5.8 added for self-hosted plugins. No update library, no
-wordpress.org listing.
+wordpress.org listing. Releases are published as GitHub releases.
 
-The source can live in a private repository; only two files need to be publicly
-readable, and neither of them is the source:
+Two files have to be readable by anyone, because WordPress fetches them with no
+credentials:
 
-* `update.json` — the manifest WordPress polls
-* `helo-smtp-X.Y.Z.zip` — the package it downloads
+* `update.json` — the manifest, attached to every release
+* `helo-smtp-X.Y.Z.zip` — the package, attached to the same release
 
-= Setup =
+**The repository must therefore be public.** A private repository's release
+assets and raw files both require an `Authorization` header, which the updater
+does not send, and embedding a token in the plugin would ship a credential to
+every site that installs it.
 
-**1. Create a public prefix in the bucket.** Everything else stays private.
-With AWS, keep Block Public Access on for the bucket and grant read on the one
-prefix instead:
+= How the URLs work =
 
-`{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Principal": "*",
-    "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::YOUR-BUCKET/plugins/helo-smtp/*"
-  }]
-}`
+The header points at GitHub's permanent "latest release" redirect:
 
-**2. Fill in `build.sh`** — `BASE_URL`, `S3_URI`, and `S3_ENDPOINT` (empty for
-AWS, the endpoint host for Hetzner and other S3-compatible providers).
+`Update URI: https://github.com/mkev07/helo/releases/latest/download/update.json`
 
-**3. Point the plugin header at the manifest**, in `helo-smtp.php`:
+That URL never changes and always resolves to the newest release's manifest, so
+publishing a release *is* publishing the update. The manifest in turn points at
+that release's zip:
 
-`Update URI: https://YOUR-BUCKET.s3.REGION.amazonaws.com/plugins/helo-smtp/update.json`
-
-It must match `BASE_URL/update.json` exactly. `build.sh` refuses to run if the
-two disagree, because a mismatch kills the update channel silently.
+`https://github.com/mkev07/helo/releases/download/vX.Y.Z/helo-smtp-X.Y.Z.zip`
 
 = Releasing =
 
-1. Bump `Version:` in the plugin header, and add a `changelog` entry in `update.json`.
-2. `./build.sh --publish`
+1. Bump the version in **three** places — `Version:` in the plugin header, `HELO_VERSION` just below it, and `Stable tag:` in this file. `build.sh` refuses to build if they disagree.
+2. Add a `changelog` entry to `update.json` and a matching one below.
+3. `./build.sh` — builds the zip and rewrites `update.json`.
+4. Commit and push.
+5. `./build.sh --publish` — tags, creates the release, and uploads both files.
 
-That builds `helo-smtp-X.Y.Z.zip`, rewrites `update.json` to match
-the header version, and uploads both with the right content types and cache
-headers. Commit and tag afterwards — the repository keeps the history, the
-bucket does the distribution.
+Step 5 will not run against a dirty or unpushed tree, so the tag always matches
+what actually shipped.
 
 = Notes =
 
 * The download URL must be HTTPS. The plugin refuses plain HTTP, because an update package is executable code.
 * The folder *inside* the zip must stay `helo-smtp`; the zip's own filename carries the version. `build.sh` gets both right.
-* `update.json` is uploaded with a 5 minute cache and the versioned zips with a 1 year immutable cache. Sites cache the manifest for a further 6 hours; **Helo → Settings → Check for updates** clears that and re-checks immediately.
-* Anyone who knows the URL can download the package. A private repository hides the history and work in progress, not the released code — presigned URLs expire, so they are not usable as a long-lived update channel.
-* Rolling back means re-uploading `update.json` with the older version and download URL. The old zips are still there.
+* Do not use GitHub's automatic "Source code (zip)" as the download URL: its top folder is `helo-X.Y.Z`, which installs as a second, separate plugin.
+* Sites cache the manifest for 6 hours. **Helo → Settings → Check for updates** clears that and re-checks immediately.
+* Rolling back means publishing a new release with an older-but-higher version number, or editing the latest release's `update.json` asset. WordPress only ever offers an update when the remote version is greater than the installed one.
 
 == Upgrading from "Simple SMTP + Mail Log" ==
 
