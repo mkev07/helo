@@ -56,13 +56,18 @@ version, url = sys.argv[1], sys.argv[2]
 with open('update.json') as fh:
     manifest = json.load(fh)
 
-manifest['version'] = version
-manifest['download_url'] = url
-manifest['last_updated'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+# Only rewrite when something real changed. Touching last_updated on every
+# run would dirty the tree that --publish insists is clean.
+if manifest.get('version') != version or manifest.get('download_url') != url:
+    manifest['version'] = version
+    manifest['download_url'] = url
+    manifest['last_updated'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 
-with open('update.json', 'w') as fh:
-    json.dump(manifest, fh, indent=2, ensure_ascii=False)
-    fh.write('\n')
+    with open('update.json', 'w') as fh:
+        json.dump(manifest, fh, indent=2, ensure_ascii=False)
+        fh.write('\n')
+
+    print('update.json rewritten — commit it before publishing')
 PY
 
 echo "built $ZIP"
