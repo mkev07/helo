@@ -35,6 +35,13 @@ class Helo_Settings {
 			'logging'    => 1,
 			'log_days'   => 30,
 			'debug'      => 0,
+
+			// Copy of each sent message, filed over IMAP.
+			'copy_to_sent'    => 0,
+			'imap_host'       => '',
+			'imap_port'       => 993,
+			'imap_encryption' => 'ssl',
+			'imap_folder'     => '',
 		);
 	}
 
@@ -99,6 +106,12 @@ class Helo_Settings {
 			'logging'    => empty( $input['logging'] ) ? 0 : 1,
 			'log_days'   => max( 0, (int) ( isset( $input['log_days'] ) ? $input['log_days'] : 30 ) ),
 			'debug'      => empty( $input['debug'] ) ? 0 : 1,
+
+			'copy_to_sent'    => empty( $input['copy_to_sent'] ) ? 0 : 1,
+			'imap_host'       => sanitize_text_field( isset( $input['imap_host'] ) ? $input['imap_host'] : '' ),
+			'imap_port'       => max( 1, min( 65535, (int) ( isset( $input['imap_port'] ) ? $input['imap_port'] : 993 ) ) ),
+			'imap_encryption' => in_array( isset( $input['imap_encryption'] ) ? $input['imap_encryption'] : '', array( 'ssl', 'tls' ), true ) ? $input['imap_encryption'] : 'ssl',
+			'imap_folder'     => sanitize_text_field( isset( $input['imap_folder'] ) ? $input['imap_folder'] : '' ),
 		);
 
 		$submitted = isset( $input['password'] ) ? (string) $input['password'] : '';
@@ -111,6 +124,9 @@ class Helo_Settings {
 
 		update_option( self::OPTION, $clean );
 		self::$cache = null;
+
+		// A changed host or folder invalidates the discovered Sent folder.
+		delete_transient( Helo_Imap::FOLDER_CACHE );
 	}
 
 	/* ------------------------------------------------------------------

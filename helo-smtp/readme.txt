@@ -4,7 +4,7 @@ Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,7 @@ Sends every WordPress email through your own SMTP server, logs what was sent, an
 * A log of every outgoing email — contact form notifications, WooCommerce mail, password resets, everything that goes through `wp_mail()`.
 * A two-pane reading view like a mail client: message list on the left, the selected email on the right.
 * Full preview of each message, HTML rendered in a sandboxed frame, with headers, attachments and the failure reason.
+* Optionally files a copy of every sent message in your mailbox's Sent folder over IMAP, so site email shows up in your normal mail client.
 * Resend any logged message.
 * Automatic daily cleanup of old log entries.
 
@@ -39,6 +40,18 @@ The log records anything sent through `wp_mail()`. Plugins that talk to an email
 = Where is the password stored? =
 
 Encrypted in the options table, using a key derived from the site's `AUTH_SALT`. Changing the salts invalidates it and you will need to re-enter it. The `HELO_SMTP_PASSWORD` constant avoids database storage entirely.
+
+= Why do sent emails not appear in my Sent folder? =
+
+Because SMTP has no concept of folders. Sending hands a message to a server for
+delivery and that is the end of it; the Sent folder lives in your mailbox and is
+written over IMAP. Gmail is the exception — it files a copy for you when you
+send through `smtp.gmail.com`. Microsoft 365 can too, but an admin has to enable
+it per mailbox with `Set-Mailbox -MessageCopyForSMTPClientSubmissionEnabled`.
+
+Ordinary mail hosting does none of this, which is why desktop clients like
+Thunderbird send over SMTP and then make a second IMAP connection to file their
+own copy. Turn on **Copy to Sent folder** in settings and Helo does the same.
 
 = Gmail / Google Workspace? =
 
@@ -111,6 +124,10 @@ Deleting the old plugin before activating Helo drops the log table and the
 settings, and there is no recovering them.
 
 == Changelog ==
+
+= 1.3.0 =
+* New: optionally file a copy of each sent message in the mailbox's Sent folder over IMAP, the way a desktop mail client does. Off by default.
+* The Sent folder is detected from the server's SPECIAL-USE flag, with an override for hosts that do not advertise one.
 
 = 1.2.0 =
 * Renamed to Helo, with a new menu icon.

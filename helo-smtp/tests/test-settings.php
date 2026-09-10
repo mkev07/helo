@@ -9,6 +9,7 @@
  */
 
 define( 'ABSPATH', __DIR__ );
+define( 'DAY_IN_SECONDS', 86400 );
 
 $GLOBALS['options'] = array();
 
@@ -29,11 +30,18 @@ function sanitize_text_field( $value ) {
 function sanitize_email( $value ) {
 	return (string) filter_var( $value, FILTER_VALIDATE_EMAIL );
 }
+function delete_transient( $name ) {
+	return true;
+}
+function add_action( $hook, $callback, $priority = 10 ) {
+	return true;
+}
 function wp_parse_args( $args, $defaults ) {
 	return array_merge( $defaults, (array) $args );
 }
 
 require_once dirname( __DIR__ ) . '/includes/class-helo-settings.php';
+require_once dirname( __DIR__ ) . '/includes/class-helo-imap.php';
 
 /**
  * @param string $name Private static method on Helo_Settings.
@@ -106,6 +114,7 @@ Helo_Settings::save(
 		'port'       => 99999,
 		'encryption' => 'carrier-pigeon',
 		'log_days'   => -5,
+		'imap_encryption' => 'carrier-pigeon',
 		'password'   => Helo_Settings::UNCHANGED,
 	)
 );
@@ -113,5 +122,6 @@ reset_cache();
 assert( 65535 === Helo_Settings::get( 'port' ), 'port not clamped' );
 assert( 'tls' === Helo_Settings::get( 'encryption' ), 'encryption not validated' );
 assert( 0 === Helo_Settings::get( 'log_days' ), 'log_days not clamped' );
+assert( 'ssl' === Helo_Settings::get( 'imap_encryption' ), 'imap_encryption not validated' );
 
 echo "ok\n";

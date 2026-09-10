@@ -165,6 +165,59 @@ $helo_encryptions = array(
 
 	<div class="helo-card">
 		<div class="helo-card__head">
+			<h2><?php esc_html_e( 'Copy to Sent folder', 'helo-smtp' ); ?></h2>
+			<p><?php esc_html_e( 'Sending does not put anything in your Sent folder — SMTP has no folders. Turn this on and Helo files a copy over IMAP, the way a desktop mail client does, so site email appears alongside everything else in your inbox.', 'helo-smtp' ); ?></p>
+		</div>
+
+		<div class="helo-field">
+			<span class="helo-field__label"><?php esc_html_e( 'Save copies', 'helo-smtp' ); ?></span>
+			<div class="helo-field__control">
+				<label class="helo-switch">
+					<input name="copy_to_sent" type="checkbox" value="1" <?php checked( $settings['copy_to_sent'] ); ?>>
+					<span><?php esc_html_e( 'File every sent message in the mailbox’s Sent folder', 'helo-smtp' ); ?></span>
+				</label>
+				<p class="helo-hint"><?php esc_html_e( 'Adds one IMAP round trip to whatever page triggered the email. It never blocks or fails a send — if the copy cannot be filed, the reason goes to the PHP error log.', 'helo-smtp' ); ?></p>
+			</div>
+		</div>
+
+		<div class="helo-field">
+			<label class="helo-field__label" for="helo-imap-host"><?php esc_html_e( 'IMAP host', 'helo-smtp' ); ?></label>
+			<div class="helo-field__control">
+				<div class="helo-row">
+					<input name="imap_host" id="helo-imap-host" type="text" style="max-width:280px"
+						placeholder="<?php echo esc_attr( '' !== $settings['host'] ? $settings['host'] : 'imap.example.com' ); ?>"
+						value="<?php echo esc_attr( $settings['imap_host'] ); ?>">
+					<select name="imap_encryption" style="max-width:150px">
+						<option value="ssl" <?php selected( $settings['imap_encryption'], 'ssl' ); ?>><?php esc_html_e( 'SSL / TLS', 'helo-smtp' ); ?></option>
+						<option value="tls" <?php selected( $settings['imap_encryption'], 'tls' ); ?>><?php esc_html_e( 'STARTTLS', 'helo-smtp' ); ?></option>
+					</select>
+					<label for="helo-imap-port" class="screen-reader-text"><?php esc_html_e( 'IMAP port', 'helo-smtp' ); ?></label>
+					<input name="imap_port" id="helo-imap-port" type="number" min="1" max="65535" value="<?php echo esc_attr( $settings['imap_port'] ); ?>">
+				</div>
+				<p class="helo-hint"><?php esc_html_e( 'Leave the host empty to reuse the SMTP host. Usually 993 for SSL, 143 for STARTTLS. The SMTP username and password are reused, so there is no second password to store.', 'helo-smtp' ); ?></p>
+			</div>
+		</div>
+
+		<div class="helo-field">
+			<label class="helo-field__label" for="helo-imap-folder"><?php esc_html_e( 'Sent folder', 'helo-smtp' ); ?></label>
+			<div class="helo-field__control">
+				<input name="imap_folder" id="helo-imap-folder" type="text" style="max-width:280px"
+					placeholder="<?php esc_attr_e( 'Detect automatically', 'helo-smtp' ); ?>"
+					value="<?php echo esc_attr( $settings['imap_folder'] ); ?>">
+				<p class="helo-hint"><?php esc_html_e( 'Leave empty and Helo asks the server which folder is Sent. Only fill this in if detection picks the wrong one — names vary, for example INBOX.Sent or Sent Items.', 'helo-smtp' ); ?></p>
+			</div>
+		</div>
+
+		<div class="helo-card__foot">
+			<p><?php esc_html_e( 'Save first, then test — the test uses what is stored.', 'helo-smtp' ); ?></p>
+			<a class="button" href="<?php echo esc_url( Helo_Imap::test_url() ); ?>">
+				<?php esc_html_e( 'Test IMAP connection', 'helo-smtp' ); ?>
+			</a>
+		</div>
+	</div>
+
+	<div class="helo-card">
+		<div class="helo-card__head">
 			<h2><?php esc_html_e( 'Log & diagnostics', 'helo-smtp' ); ?></h2>
 			<p><?php esc_html_e( 'What gets recorded, and for how long.', 'helo-smtp' ); ?></p>
 		</div>
