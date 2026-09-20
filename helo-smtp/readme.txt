@@ -4,7 +4,7 @@ Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.6.0
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,9 @@ Deleting the old plugin before activating Helo drops the log table and the
 settings, and there is no recovering them.
 
 == Changelog ==
+
+= 1.7.0 =
+* New: Turnstile now auto-protects Elementor Pro forms, in addition to the other form builders.
 
 = 1.6.0 =
 * New: Turnstile now auto-protects many form builders without a shortcode — WPForms, Forminator, Fluent Forms, Formidable, Jetpack, Gravity Forms, Kadence, and SureForms. Enable each on the Bot protection screen.

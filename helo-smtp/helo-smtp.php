@@ -3,7 +3,7 @@
  * Plugin Name:       Helo — SMTP & Mail Log
  * Plugin URI:        https://github.com/mkev07/helo
  * Description:       Sends all WordPress mail through your own SMTP server, logs every message, and lets you preview or resend it.
- * Version:           1.6.0
+ * Version:           1.7.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            Kevin Mukoond
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HELO_VERSION', '1.6.0' );
+define( 'HELO_VERSION', '1.7.0' );
 define( 'HELO_FILE', __FILE__ );
 define( 'HELO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'HELO_URL', plugin_dir_url( __FILE__ ) );

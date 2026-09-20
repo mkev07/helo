@@ -28,6 +28,7 @@ class Helo_Form_Integrations {
 		self::wire_gravity();
 		self::wire_kadence();
 		self::wire_sureforms();
+		self::wire_elementor();
 	}
 
 	/* ------------------------------------------------------------- helpers */
@@ -409,5 +410,82 @@ class Helo_Form_Integrations {
 
 	public static function sureforms_message( $message, $form_id, $form_data ) {
 		return self::$sureforms_failed ? Helo_Turnstile::failed_message() : $message;
+	}
+
+	/* ------------------------------------------------------------- Elementor */
+
+	/** Gate: Elementor Pro (not the free builder alone). */
+	protected static function elementor_active() {
+		return defined( 'ELEMENTOR_PRO_VERSION' );
+	}
+
+	public static function wire_elementor() {
+		if ( ! Helo_Settings::get( 'turnstile_elementor' ) || ! self::elementor_active() ) {
+			return;
+		}
+
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'elementor_enqueue' ), 99 );
+		add_action( 'elementor_pro/forms/validation', array( __CLASS__, 'elementor_check' ), 10, 2 );
+
+		// Elementor 4 atomic-style forms post to their own admin-ajax action and do not
+		// run elementor_pro/forms/validation; reject a missing/invalid token there too.
+		add_action( 'wp_ajax_elementor_pro_atomic_forms_send_form', array( __CLASS__, 'elementor_atomic_check' ), 5 );
+		add_action( 'wp_ajax_nopriv_elementor_pro_atomic_forms_send_form', array( __CLASS__, 'elementor_atomic_check' ), 5 );
+	}
+
+	public static function elementor_enqueue() {
+		if ( ! Helo_Turnstile::enabled() ) {
+			return;
+		}
+
+		// Ensure Cloudflare's API script is loaded so window.turnstile exists and
+		// the render queue drains; the JS then injects into .elementor-form.
+		Helo_Turnstile::require_api();
+
+		wp_enqueue_script(
+			'helo-elementor',
+			HELO_URL . 'js/helo-elementor.js',
+			array( 'jquery' ),
+			HELO_VERSION,
+			true
+		);
+		wp_localize_script(
+			'helo-elementor',
+			'heloElementorSettings',
+			array(
+				'sitekey'       => Helo_Settings::get( 'turnstile_site_key' ),
+				'enabled'       => true,
+				'theme'         => Helo_Settings::get( 'turnstile_theme' ),
+				'appearance'    => Helo_Settings::get( 'turnstile_appearance' ),
+				'position'      => 'before',
+				'disableSubmit' => false,
+			)
+		);
+	}
+
+	public static function elementor_check( $record, $ajax_handler ) {
+		if ( 'POST' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '' ) ) {
+			$ajax_handler->add_error_message( Helo_Turnstile::failed_message() );
+			$ajax_handler->is_success = false;
+			return;
+		}
+
+		$check = Helo_Turnstile::check( '', 'form-elementor' );
+		if ( ! $check['success'] ) {
+			$ajax_handler->add_error_message( Helo_Turnstile::failed_message() );
+			$ajax_handler->add_error( '', '' );
+			$ajax_handler->is_success = false;
+		}
+	}
+
+	public static function elementor_atomic_check() {
+		if ( 'POST' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '' ) ) {
+			wp_send_json_error( array( 'message' => Helo_Turnstile::failed_message() ) );
+		}
+
+		$check = Helo_Turnstile::check( '', 'elementor-atomic-form' );
+		if ( empty( $check['success'] ) ) {
+			wp_send_json_error( array( 'message' => Helo_Turnstile::failed_message() ) );
+		}
 	}
 }
