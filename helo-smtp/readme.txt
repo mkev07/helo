@@ -4,7 +4,7 @@ Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,9 @@ Deleting the old plugin before activating Helo drops the log table and the
 settings, and there is no recovering them.
 
 == Changelog ==
+
+= 1.4.1 =
+* A "Check for updates" link on the plugin's row on the Plugins screen, next to Settings, for an on-demand update check.
 
 = 1.4.0 =
 * New: Cloudflare Turnstile bot & spam protection for WordPress forms — login, registration, lost-password, comments, WooCommerce and Contact Form 7.
