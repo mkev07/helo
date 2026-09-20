@@ -4,7 +4,7 @@ Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,11 @@ Deleting the old plugin before activating Helo drops the log table and the
 settings, and there is no recovering them.
 
 == Changelog ==
+
+= 1.4.0 =
+* New: Cloudflare Turnstile bot & spam protection for WordPress forms — login, registration, lost-password, comments, WooCommerce and Contact Form 7.
+* Comments are blocked with no exceptions when Turnstile is enabled and keys are set.
+* New Security tab: verified vs blocked counts, per-form breakdown, block reasons, and an opt-in debug log (off by default).
 
 = 1.3.0 =
 * New: optionally file a copy of each sent message in the mailbox's Sent folder over IMAP, the way a desktop mail client does. Off by default.
