@@ -28,11 +28,15 @@ require_once HELO_PATH . 'includes/class-helo-logger.php';
 require_once HELO_PATH . 'includes/class-helo-mailer.php';
 require_once HELO_PATH . 'includes/class-helo-imap.php';
 require_once HELO_PATH . 'includes/class-helo-updater.php';
+require_once HELO_PATH . 'includes/class-helo-turnstile.php';
+require_once HELO_PATH . 'includes/class-helo-analytics.php';
 
 Helo_Mailer::init();
 Helo_Logger::init();
 Helo_Imap::init();
 Helo_Updater::init();
+Helo_Turnstile::init();
+Helo_Analytics::init();
 
 if ( is_admin() ) {
 	require_once HELO_PATH . 'admin/class-helo-admin.php';

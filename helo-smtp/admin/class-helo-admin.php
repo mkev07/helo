@@ -21,6 +21,7 @@ class Helo_Admin {
 		add_action( 'admin_post_helo_test', array( __CLASS__, 'handle_test' ) );
 		add_action( 'admin_post_helo_resend', array( __CLASS__, 'handle_resend' ) );
 		add_action( 'admin_post_helo_delete', array( __CLASS__, 'handle_delete' ) );
+		// Turnstile analytics reset handlers are registered in Helo_Analytics::init().
 	}
 
 	public static function register_menu() {
@@ -145,7 +146,10 @@ class Helo_Admin {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'helo-smtp' ) );
 		}
 
-		$tab = ( isset( $_GET['tab'] ) && 'logs' === $_GET['tab'] ) ? 'logs' : 'settings';
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';
+		if ( ! in_array( $tab, array( 'settings', 'logs', 'security' ), true ) ) {
+			$tab = 'settings';
+		}
 
 		echo '<div class="wrap helo-app">';
 
@@ -153,7 +157,15 @@ class Helo_Admin {
 		self::print_notice();
 		self::print_tabs( $tab );
 
-		if ( 'logs' === $tab ) {
+		if ( 'security' === $tab ) {
+			self::view(
+				'security',
+				array(
+					'analytics' => Helo_Analytics::snapshot(),
+					'log'       => Helo_Analytics::log(),
+				)
+			);
+		} elseif ( 'logs' === $tab ) {
 			$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 			$paged  = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1;
 
@@ -215,6 +227,9 @@ class Helo_Admin {
 				<?php if ( $count ) : ?>
 					<span class="helo-count"><?php echo esc_html( number_format_i18n( $count ) ); ?></span>
 				<?php endif; ?>
+			</a>
+			<a href="<?php echo esc_url( self::url( array( 'tab' => 'security' ) ) ); ?>" <?php echo 'security' === $current ? 'aria-current="page"' : ''; ?>>
+				<?php esc_html_e( 'Security', 'helo-smtp' ); ?>
 			</a>
 		</nav>
 		<?php

@@ -42,6 +42,21 @@ class Helo_Settings {
 			'imap_port'       => 993,
 			'imap_encryption' => 'ssl',
 			'imap_folder'     => '',
+
+			// Cloudflare Turnstile bot protection.
+			'turnstile_enable'      => 0,
+			'turnstile_site_key'    => '',
+			'turnstile_secret_key'  => '',
+			'turnstile_theme'       => 'auto',
+			'turnstile_appearance'  => 'always',
+			'turnstile_login'       => 0,
+			'turnstile_register'    => 0,
+			'turnstile_reset'       => 0,
+			'turnstile_comments'    => 0,
+			'turnstile_woo'         => 0,
+			'turnstile_cf7'         => 0,
+			'turnstile_analytics'   => 1,
+			'turnstile_debug_log'   => 0,
 		);
 	}
 
@@ -112,6 +127,20 @@ class Helo_Settings {
 			'imap_port'       => max( 1, min( 65535, (int) ( isset( $input['imap_port'] ) ? $input['imap_port'] : 993 ) ) ),
 			'imap_encryption' => in_array( isset( $input['imap_encryption'] ) ? $input['imap_encryption'] : '', array( 'ssl', 'tls' ), true ) ? $input['imap_encryption'] : 'ssl',
 			'imap_folder'     => sanitize_text_field( isset( $input['imap_folder'] ) ? $input['imap_folder'] : '' ),
+
+			'turnstile_enable'     => empty( $input['turnstile_enable'] ) ? 0 : 1,
+			'turnstile_site_key'   => sanitize_text_field( isset( $input['turnstile_site_key'] ) ? $input['turnstile_site_key'] : '' ),
+			'turnstile_secret_key' => sanitize_text_field( isset( $input['turnstile_secret_key'] ) ? $input['turnstile_secret_key'] : '' ),
+			'turnstile_theme'      => in_array( isset( $input['turnstile_theme'] ) ? $input['turnstile_theme'] : '', array( 'auto', 'light', 'dark' ), true ) ? $input['turnstile_theme'] : 'auto',
+			'turnstile_appearance' => in_array( isset( $input['turnstile_appearance'] ) ? $input['turnstile_appearance'] : '', array( 'always', 'interaction-only' ), true ) ? $input['turnstile_appearance'] : 'always',
+			'turnstile_login'      => empty( $input['turnstile_login'] ) ? 0 : 1,
+			'turnstile_register'   => empty( $input['turnstile_register'] ) ? 0 : 1,
+			'turnstile_reset'      => empty( $input['turnstile_reset'] ) ? 0 : 1,
+			'turnstile_comments'   => empty( $input['turnstile_comments'] ) ? 0 : 1,
+			'turnstile_woo'        => empty( $input['turnstile_woo'] ) ? 0 : 1,
+			'turnstile_cf7'        => empty( $input['turnstile_cf7'] ) ? 0 : 1,
+			'turnstile_analytics'  => empty( $input['turnstile_analytics'] ) ? 0 : 1,
+			'turnstile_debug_log'  => empty( $input['turnstile_debug_log'] ) ? 0 : 1,
 		);
 
 		$submitted = isset( $input['password'] ) ? (string) $input['password'] : '';
