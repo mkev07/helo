@@ -4,7 +4,7 @@ Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.1
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,11 @@ Deleting the old plugin before activating Helo drops the log table and the
 settings, and there is no recovering them.
 
 == Changelog ==
+
+= 1.5.0 =
+* The admin is reorganised into separate screens: Dashboard, Mail, Email log, Bot protection, and Security log.
+* New Dashboard gives an at-a-glance status with shortcuts to each screen and to Cloudflare / WordPress pages.
+* Helpful quick links: create Cloudflare Turnstile keys, open the Plugins or General settings screens.
 
 = 1.4.1 =
 * A "Check for updates" link on the plugin's row on the Plugins screen, next to Settings, for an on-demand update check.

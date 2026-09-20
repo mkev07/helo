@@ -490,7 +490,7 @@ class Helo_Imap {
 			MINUTE_IN_SECONDS
 		);
 
-		wp_safe_redirect( Helo_Admin::url() );
+		wp_safe_redirect( Helo_Admin::mail_url() );
 		exit;
 	}
 }
