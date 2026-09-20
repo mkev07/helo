@@ -230,14 +230,14 @@ class Helo_Analytics {
 	public static function handle_reset() {
 		self::guard( 'helo_turnstile_reset_analytics' );
 		self::clear();
-		wp_safe_redirect( add_query_arg( 'tab', 'security', admin_url( 'admin.php?page=helo' ) ) );
+		wp_safe_redirect( Helo_Admin::analytics_url() );
 		exit;
 	}
 
 	public static function handle_reset_log() {
 		self::guard( 'helo_turnstile_reset_log' );
 		self::clear_log();
-		wp_safe_redirect( add_query_arg( 'tab', 'security', admin_url( 'admin.php?page=helo' ) ) );
+		wp_safe_redirect( Helo_Admin::analytics_url() );
 		exit;
 	}
 

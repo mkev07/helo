@@ -57,54 +57,29 @@
 	font-size: 13px;
 }
 
-/* ------------------------------------------------------------------- tabs */
+/* ----------------------------------------------------------- dashboard */
 
-.helo-tabs {
-	display: inline-flex;
-	gap: 2px;
-	padding: 3px;
+.helo-dash-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 16px;
 	margin: 0 0 20px;
-	background: #f0f0f1;
-	border-radius: var(--helo-radius);
 }
 
-.helo-tabs a {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 6px 14px;
-	border-radius: 6px;
-	color: var(--helo-muted);
-	font-size: 13px;
-	font-weight: 500;
-	text-decoration: none;
-	transition: background .12s, color .12s;
+.helo-dash-card .helo-card__head h2 .dashicons {
+	margin-right: 6px;
+	color: var(--helo-accent);
+	position: relative;
+	top: 2px;
 }
 
-.helo-tabs a:hover {
-	color: var(--helo-fg);
+.helo-dash-summary {
+	margin: 0 0 24px;
 }
 
-.helo-tabs a[aria-current="page"] {
-	background: var(--helo-surface);
-	color: var(--helo-fg);
-	font-weight: 600;
-	box-shadow: var(--helo-shadow);
-}
-
-.helo-tabs a:focus-visible {
-	outline: 2px solid var(--helo-accent);
-	outline-offset: 1px;
-}
-
-.helo-tabs .helo-count {
-	padding: 0 6px;
-	border-radius: 999px;
-	background: #dcdcde;
-	color: #50575e;
-	font-size: 11px;
-	font-weight: 600;
-	line-height: 17px;
+.helo-quicklinks .helo-row {
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 /* ------------------------------------------------------------------ cards */
@@ -357,6 +332,10 @@
 	font-weight: 600;
 	line-height: 1.4;
 	word-break: break-word;
+}
+
+.helo-summary__value--ok {
+	color: var(--helo-ok, #00a32a);
 }
 
 .helo-summary__value small {

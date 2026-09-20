@@ -1,6 +1,9 @@
 <?php
 /**
- * Admin screen: menu, tab routing, form handlers.
+ * Admin: submenu pages, routing, form handlers.
+ *
+ * Helo is organised as one parent menu with several submenu screens:
+ *   Helo (dashboard) - Mail - Email log - Bot protection - Security log.
  *
  * @package Helo
  */
@@ -9,8 +12,18 @@ defined( 'ABSPATH' ) || exit;
 
 class Helo_Admin {
 
-	const SLUG           = 'helo';
+	const SLUG      = 'helo';
+	const SUB_MAIL       = 'helo-mail';
+	const SUB_LOGS       = 'helo-logs';
+	const SUB_SECURITY   = 'helo-security';
+	const SUB_ANALYTICS  = 'helo-analytics';
 	const NOTICE_TRANSIENT = 'helo_notice';
+
+	/** Map each screen's slug to the admin-post action it saves, for redirects. */
+	const RETURN_MAP = array(
+		self::SUB_MAIL      => 'mail_url',
+		self::SUB_SECURITY  => 'security_url',
+	);
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
@@ -26,13 +39,57 @@ class Helo_Admin {
 
 	public static function register_menu() {
 		add_menu_page(
-			__( 'Helo — SMTP & Mail Log', 'helo-smtp' ),
+			__( 'Helo — SMTP, Mail Log & Bot Protection', 'helo-smtp' ),
 			__( 'Helo', 'helo-smtp' ),
 			Helo_Settings::CAPABILITY,
 			self::SLUG,
-			array( __CLASS__, 'render' ),
+			array( __CLASS__, 'render_dashboard' ),
 			self::menu_icon(),
 			80
+		);
+
+		// Dashboard as a first child carrying the parent slug: WordPress uses
+		// this to auto-highlight the parent + this child, avoiding a duplicate
+		// auto-added parent flyout link.
+		add_submenu_page(
+			self::SLUG,
+			__( 'Dashboard', 'helo-smtp' ),
+			__( 'Dashboard', 'helo-smtp' ),
+			Helo_Settings::CAPABILITY,
+			self::SLUG,
+			array( __CLASS__, 'render_dashboard' )
+		);
+		add_submenu_page(
+			self::SLUG,
+			__( 'Mail', 'helo-smtp' ),
+			__( 'Mail', 'helo-smtp' ),
+			Helo_Settings::CAPABILITY,
+			self::SUB_MAIL,
+			array( __CLASS__, 'render_mail' )
+		);
+		add_submenu_page(
+			self::SLUG,
+			__( 'Email log', 'helo-smtp' ),
+			__( 'Email log', 'helo-smtp' ),
+			Helo_Settings::CAPABILITY,
+			self::SUB_LOGS,
+			array( __CLASS__, 'render_logs' )
+		);
+		add_submenu_page(
+			self::SLUG,
+			__( 'Bot protection', 'helo-smtp' ),
+			__( 'Bot protection', 'helo-smtp' ),
+			Helo_Settings::CAPABILITY,
+			self::SUB_SECURITY,
+			array( __CLASS__, 'render_security' )
+		);
+		add_submenu_page(
+			self::SLUG,
+			__( 'Security log', 'helo-smtp' ),
+			__( 'Security log', 'helo-smtp' ),
+			Helo_Settings::CAPABILITY,
+			self::SUB_ANALYTICS,
+			array( __CLASS__, 'render_analytics' )
 		);
 	}
 
@@ -57,7 +114,10 @@ class Helo_Admin {
 	 * @param string $hook_suffix Current admin page.
 	 */
 	public static function enqueue( $hook_suffix ) {
-		if ( 'toplevel_page_' . self::SLUG !== $hook_suffix ) {
+		// Load our CSS on the dashboard (toplevel_page_helo) and every submenu
+		// (helo_page_helo-*). A prefix match keeps this working without listing
+		// every hook.
+		if ( 0 !== strpos( $hook_suffix, 'helo' ) ) {
 			return;
 		}
 
@@ -72,7 +132,7 @@ class Helo_Admin {
 	public static function action_links( $links ) {
 		array_unshift(
 			$links,
-			sprintf( '<a href="%s">%s</a>', esc_url( self::url() ), esc_html__( 'Settings', 'helo-smtp' ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( self::mail_url() ), esc_html__( 'Settings', 'helo-smtp' ) ),
 			sprintf( '<a href="%s">%s</a>', esc_url( Helo_Updater::check_url() ), esc_html__( 'Check for updates', 'helo-smtp' ) )
 		);
 
@@ -81,10 +141,7 @@ class Helo_Admin {
 
 	/* ------------------------------------------------------------------ urls */
 
-	/**
-	 * @param array $args Extra query args.
-	 * @return string
-	 */
+	/** Dashboard (parent) URL. */
 	public static function url( array $args = array() ) {
 		return add_query_arg(
 			array_merge( array( 'page' => self::SLUG ), $args ),
@@ -92,20 +149,14 @@ class Helo_Admin {
 		);
 	}
 
-	/**
-	 * A log URL that keeps the current search and page, so selecting a message
-	 * does not throw away where you were in the list.
-	 *
-	 * @param string $search Current search term.
-	 * @param int    $paged  Current page.
-	 * @param int    $log_id Message to select, 0 for none.
-	 * @return string
-	 */
-	public static function log_url( $search = '', $paged = 1, $log_id = 0 ) {
-		$args = array( 'tab' => 'logs' );
+	public static function mail_url() {
+		return add_query_arg( 'page', self::SUB_MAIL, admin_url( 'admin.php' ) );
+	}
+
+	public static function logs_url( $search = '', $paged = 1, $log_id = 0 ) {
+		$args = array( 'page' => self::SUB_LOGS );
 
 		if ( '' !== $search ) {
-			// add_query_arg() does not encode values.
 			$args['s'] = rawurlencode( $search );
 		}
 
@@ -117,7 +168,15 @@ class Helo_Admin {
 			$args['log'] = (int) $log_id;
 		}
 
-		return self::url( $args );
+		return add_query_arg( $args, admin_url( 'admin.php' ) );
+	}
+
+	public static function security_url() {
+		return add_query_arg( 'page', self::SUB_SECURITY, admin_url( 'admin.php' ) );
+	}
+
+	public static function analytics_url() {
+		return add_query_arg( 'page', self::SUB_ANALYTICS, admin_url( 'admin.php' ) );
 	}
 
 	/**
@@ -142,98 +201,130 @@ class Helo_Admin {
 
 	/* --------------------------------------------------------------- render */
 
-	public static function render() {
+	/** Cap-check + page scaffold shared by every screen. */
+	private static function page_top( $title, $subtitle = '', array $badges = array() ) {
 		if ( ! current_user_can( Helo_Settings::CAPABILITY ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'helo-smtp' ) );
 		}
 
-		$tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'settings';
-		if ( ! in_array( $tab, array( 'settings', 'logs', 'security' ), true ) ) {
-			$tab = 'settings';
-		}
-
 		echo '<div class="wrap helo-app">';
 
-		self::print_header();
-		self::print_notice();
-		self::print_tabs( $tab );
-
-		if ( 'security' === $tab ) {
-			self::view(
-				'security',
-				array(
-					'analytics' => Helo_Analytics::snapshot(),
-					'log'       => Helo_Analytics::log(),
-				)
-			);
-		} elseif ( 'logs' === $tab ) {
-			$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
-			$paged  = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1;
-
-			$per_page = 25;
-			$results  = Helo_Logger::query( compact( 'search', 'paged', 'per_page' ) );
-
-			// Like a mail client, open the newest message when none is picked.
-			$log_id = isset( $_GET['log'] ) ? (int) $_GET['log'] : 0;
-			if ( ! $log_id && ! empty( $results['rows'] ) ) {
-				$log_id = (int) $results['rows'][0]->id;
-			}
-
-			$log = $log_id ? Helo_Logger::get( $log_id ) : null;
-
-			self::view( 'logs', $results + compact( 'search', 'paged', 'per_page', 'log' ) );
-		} else {
-			self::view(
-				'settings',
-				array(
-					'settings' => Helo_Settings::all(),
-					'stats'    => Helo_Logger::stats(),
-				)
-			);
+		if ( '' === $title ) {
+			return;
 		}
-
-		echo '</div>';
-	}
-
-	private static function print_header() {
 		?>
 		<div class="helo-head">
 			<div>
-				<h1>Helo</h1>
-				<p><?php esc_html_e( 'SMTP delivery, and a record of every email this site sends.', 'helo-smtp' ); ?></p>
-			</div>
-			<div class="helo-row">
-				<?php if ( Helo_Settings::is_configured() ) : ?>
-					<span class="helo-badge helo-badge--ok"><?php esc_html_e( 'SMTP active', 'helo-smtp' ); ?></span>
-				<?php else : ?>
-					<span class="helo-badge helo-badge--muted"><?php esc_html_e( 'Using PHP mail()', 'helo-smtp' ); ?></span>
+				<h1><?php echo esc_html( $title ); ?></h1>
+				<?php if ( '' !== $subtitle ) : ?>
+					<p><?php echo esc_html( $subtitle ); ?></p>
 				<?php endif; ?>
 			</div>
+			<?php if ( ! empty( $badges ) ) : ?>
+				<div class="helo-row"><?php foreach ( $badges as $helo_b ) : ?><span class="helo-badge helo-badge--<?php echo esc_attr( $helo_b[0] ); ?>"><?php echo esc_html( $helo_b[1] ); ?></span><?php endforeach; ?></div>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
 
-	/**
-	 * @param string $current Active tab.
-	 */
-	private static function print_tabs( $current ) {
-		$count = Helo_Logger::count();
-		?>
-		<nav class="helo-tabs">
-			<a href="<?php echo esc_url( self::url() ); ?>" <?php echo 'settings' === $current ? 'aria-current="page"' : ''; ?>>
-				<?php esc_html_e( 'Settings', 'helo-smtp' ); ?>
-			</a>
-			<a href="<?php echo esc_url( self::url( array( 'tab' => 'logs' ) ) ); ?>" <?php echo 'logs' === $current ? 'aria-current="page"' : ''; ?>>
-				<?php esc_html_e( 'Email log', 'helo-smtp' ); ?>
-				<?php if ( $count ) : ?>
-					<span class="helo-count"><?php echo esc_html( number_format_i18n( $count ) ); ?></span>
-				<?php endif; ?>
-			</a>
-			<a href="<?php echo esc_url( self::url( array( 'tab' => 'security' ) ) ); ?>" <?php echo 'security' === $current ? 'aria-current="page"' : ''; ?>>
-				<?php esc_html_e( 'Security', 'helo-smtp' ); ?>
-			</a>
-		</nav>
-		<?php
+	private static function page_bottom() {
+		echo '</div>';
+	}
+
+	public static function render_dashboard() {
+		self::page_top(
+			__( 'Helo', 'helo-smtp' ),
+			__( 'SMTP delivery, a record of every email, and bot protection — in one place.', 'helo-smtp' ),
+			array( array( Helo_Settings::is_configured() ? 'ok' : 'muted', Helo_Settings::is_configured() ? __( 'SMTP active', 'helo-smtp' ) : __( 'Using PHP mail()', 'helo-smtp' ) ) )
+		);
+		self::print_notice();
+
+		Helo_Admin::view(
+			'dashboard',
+			array(
+				'settings' => Helo_Settings::all(),
+				'stats'    => Helo_Logger::stats(),
+				'mail_count' => Helo_Logger::count(),
+			)
+		);
+
+		self::page_bottom();
+	}
+
+	public static function render_mail() {
+		self::page_top(
+			__( 'Mail', 'helo-smtp' ),
+			__( 'How outbound mail is handed off, and who signs it.', 'helo-smtp' )
+		);
+		self::print_notice();
+
+		Helo_Admin::view(
+			'mail',
+			array(
+				'settings' => Helo_Settings::all(),
+				'stats'    => Helo_Logger::stats(),
+			)
+		);
+
+		self::page_bottom();
+	}
+
+	public static function render_logs() {
+		self::page_top( __( 'Email log', 'helo-smtp' ), __( 'Every message this site sent, past and present.', 'helo-smtp' ) );
+		self::print_notice();
+
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$paged  = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1;
+
+		$per_page = 25;
+		$results  = Helo_Logger::query( compact( 'search', 'paged', 'per_page' ) );
+
+		// Like a mail client, open the newest message when none is picked.
+		$log_id = isset( $_GET['log'] ) ? (int) $_GET['log'] : 0;
+		if ( ! $log_id && ! empty( $results['rows'] ) ) {
+			$log_id = (int) $results['rows'][0]->id;
+		}
+
+		$log = $log_id ? Helo_Logger::get( $log_id ) : null;
+
+		Helo_Admin::view( 'logs', $results + compact( 'search', 'paged', 'per_page', 'log' ) );
+
+		self::page_bottom();
+	}
+
+	public static function render_security() {
+		self::page_top(
+			__( 'Bot protection', 'helo-smtp' ),
+			__( 'Cloudflare Turnstile keys and which forms they guard.', 'helo-smtp' )
+		);
+		self::print_notice();
+
+		Helo_Admin::view(
+			'security',
+			array(
+				'settings' => Helo_Settings::all(),
+			)
+		);
+
+		self::page_bottom();
+	}
+
+	public static function render_analytics() {
+		self::page_top(
+			__( 'Security log', 'helo-smtp' ),
+			__( 'How the bot protection is doing — verified vs blocked.', 'helo-smtp' )
+		);
+		self::print_notice();
+
+		Helo_Admin::view(
+			'analytics',
+			array(
+				'analytics' => Helo_Analytics::snapshot(),
+				'log'       => Helo_Analytics::log(),
+			)
+		);
+
+		self::page_bottom();
 	}
 
 	/**
@@ -283,14 +374,22 @@ class Helo_Admin {
 		}
 	}
 
+	/** Redirect after a settings save, honouring the screen the form came from. */
+	private static function save_redirect() {
+		$slug = isset( $_POST['return_slug'] ) ? sanitize_key( wp_unslash( $_POST['return_slug'] ) ) : '';
+
+		$url = self::SUB_SECURITY === $slug ? self::security_url() : self::mail_url();
+		wp_safe_redirect( $url );
+		exit;
+	}
+
 	public static function handle_save() {
 		self::guard( 'helo_save' );
 
 		Helo_Settings::save( wp_unslash( $_POST ) );
 
 		self::flash( 'success', __( 'Settings saved.', 'helo-smtp' ) );
-		wp_safe_redirect( self::url() );
-		exit;
+		self::save_redirect();
 	}
 
 	public static function handle_test() {
@@ -300,7 +399,7 @@ class Helo_Admin {
 
 		if ( ! is_email( $to ) ) {
 			self::flash( 'error', __( 'That is not a valid email address.', 'helo-smtp' ) );
-			wp_safe_redirect( self::url() );
+			wp_safe_redirect( self::mail_url() );
 			exit;
 		}
 
@@ -319,7 +418,7 @@ class Helo_Admin {
 			);
 		}
 
-		wp_safe_redirect( self::url() );
+		wp_safe_redirect( self::mail_url() );
 		exit;
 	}
 
@@ -342,7 +441,7 @@ class Helo_Admin {
 			);
 		}
 
-		wp_safe_redirect( self::url( array( 'tab' => 'logs' ) ) );
+		wp_safe_redirect( self::logs_url() );
 		exit;
 	}
 
@@ -353,7 +452,7 @@ class Helo_Admin {
 		Helo_Logger::delete( $id );
 
 		self::flash( 'success', __( 'Log entry deleted.', 'helo-smtp' ) );
-		wp_safe_redirect( self::url( array( 'tab' => 'logs' ) ) );
+		wp_safe_redirect( self::logs_url() );
 		exit;
 	}
 }

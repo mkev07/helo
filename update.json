@@ -1,7 +1,7 @@
 {
   "name": "Helo — SMTP & Mail Log",
-  "version": "1.4.1",
-  "download_url": "https://github.com/mkev07/helo/releases/download/v1.4.1/helo-smtp-1.4.1.zip",
+  "version": "1.5.0",
+  "download_url": "https://github.com/mkev07/helo/releases/download/v1.5.0/helo-smtp-1.5.0.zip",
   "homepage": "https://github.com/mkev07/helo",
   "author": "<a href=\"https://vectorads.mu\">Kevin Mukoond</a>",
   "requires": "5.9",
@@ -10,6 +10,6 @@
   "last_updated": "2026-09-20 11:24:09",
   "sections": {
     "description": "Sends all WordPress mail through your own SMTP server, logs every message, and lets you preview or resend it.",
-    "changelog": "<h4>1.4.1</h4><ul><li>Add a Check for updates link to the plugin's row on the Plugins screen.</li></ul><h4>1.4.0</h4><ul><li>Cloudflare Turnstile bot and spam protection for login, registration, lost-password, comments, WooCommerce and Contact Form 7.</li><li>Comments blocked with no exceptions when enabled.</li><li>New Security tab with verified/blocked analytics and an opt-in debug log.</li></ul><h4>1.3.0</h4><ul><li>Optionally file a copy of each sent message in the mailbox's Sent folder over IMAP.</li><li>Sent folder detected automatically, with a manual override.</li></ul><h4>1.2.0</h4><ul><li>Renamed to Helo, with a new menu icon.</li><li>Email log is now a two-pane mail client view.</li><li>Existing settings and logs are adopted automatically.</li></ul><h4>1.1.0</h4><ul><li>Redesigned admin screens.</li><li>Self-hosted updates.</li></ul><h4>1.0.0</h4><ul><li>First release.</li></ul>"
+    "changelog": "<h4>1.5.0</h4><ul><li>Admin reorganised into Dashboard, Mail, Email log, Bot protection and Security log screens.</li><li>New Dashboard with status and shortcuts to Cloudflare and WordPress pages.</li></ul><h4>1.5.0</h4><ul><li>Admin reorganised into Dashboard, Mail, Email log, Bot protection and Security log screens.</li><li>New Dashboard with status and shortcuts to Cloudflare and WordPress pages.</li></ul><h4>1.4.1</h4><ul><li>Add a Check for updates link to the plugin's row on the Plugins screen.</li></ul><h4>1.4.0</h4><ul><li>Cloudflare Turnstile bot and spam protection for login, registration, lost-password, comments, WooCommerce and Contact Form 7.</li><li>Comments blocked with no exceptions when enabled.</li><li>New Security tab with verified/blocked analytics and an opt-in debug log.</li></ul><h4>1.3.0</h4><ul><li>Optionally file a copy of each sent message in the mailbox's Sent folder over IMAP.</li><li>Sent folder detected automatically, with a manual override.</li></ul><h4>1.2.0</h4><ul><li>Renamed to Helo, with a new menu icon.</li><li>Email log is now a two-pane mail client view.</li><li>Existing settings and logs are adopted automatically.</li></ul><h4>1.1.0</h4><ul><li>Redesigned admin screens.</li><li>Self-hosted updates.</li></ul><h4>1.0.0</h4><ul><li>First release.</li></ul>"
   }
 }

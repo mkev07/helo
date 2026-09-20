@@ -16,14 +16,13 @@ defined( 'ABSPATH' ) || exit;
 
 <div class="helo-toolbar">
 	<form method="get" class="helo-search">
-		<input type="hidden" name="page" value="<?php echo esc_attr( Helo_Admin::SLUG ); ?>">
-		<input type="hidden" name="tab" value="logs">
+		<input type="hidden" name="page" value="<?php echo esc_attr( Helo_Admin::SUB_LOGS ); ?>">
 		<label for="helo-search" class="screen-reader-text"><?php esc_html_e( 'Search emails', 'helo-smtp' ); ?></label>
 		<input type="search" name="s" id="helo-search" value="<?php echo esc_attr( $search ); ?>"
 			placeholder="<?php esc_attr_e( 'Search recipient or subject…', 'helo-smtp' ); ?>">
 		<?php submit_button( __( 'Search', 'helo-smtp' ), 'secondary', '', false ); ?>
 		<?php if ( '' !== $search ) : ?>
-			<a class="button-link" href="<?php echo esc_url( Helo_Admin::log_url() ); ?>">
+			<a class="button-link" href="<?php echo esc_url( Helo_Admin::logs_url() ); ?>">
 				<?php esc_html_e( 'Clear', 'helo-smtp' ); ?>
 			</a>
 		<?php endif; ?>
@@ -71,7 +70,7 @@ defined( 'ABSPATH' ) || exit;
 				$helo_selected = $log && (int) $log->id === (int) $helo_row->id;
 				$helo_failed   = 'sent' !== $helo_row->status;
 				?>
-				<a class="helo-msg" href="<?php echo esc_url( Helo_Admin::log_url( $search, $paged, $helo_row->id ) ); ?>"
+				<a class="helo-msg" href="<?php echo esc_url( Helo_Admin::logs_url( $search, $paged, $helo_row->id ) ); ?>"
 					<?php echo $helo_selected ? 'aria-current="true"' : ''; ?>>
 					<span class="helo-msg__top">
 						<span class="helo-msg__subject">
@@ -96,14 +95,14 @@ defined( 'ABSPATH' ) || exit;
 						paginate_links(
 							array(
 								// paginate_links() substitutes %#%, so the page slot is built by hand.
-								'base'      => Helo_Admin::url(
-									array_filter(
-										array(
-											'tab'   => 'logs',
-											's'     => '' !== $search ? rawurlencode( $search ) : null,
-											'paged' => '%#%',
-										)
-									)
+								// Kept as a string — do not int-cast it.
+								'base'      => add_query_arg(
+									array(
+										'page'  => Helo_Admin::SUB_LOGS,
+										's'     => '' !== $search ? rawurlencode( $search ) : null,
+										'paged' => '%#%',
+									),
+									admin_url( 'admin.php' )
 								),
 								'format'    => '',
 								'current'   => $paged,

@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings tab.
+ * Mail screen: SMTP delivery, sender, copy-to-Sent, and diagnostics.
  *
  * @package Helo
  * @var array $settings Resolved plugin settings.
@@ -18,51 +18,9 @@ $helo_encryptions = array(
 );
 ?>
 
-<div class="helo-summary">
-	<div class="helo-summary__cell">
-		<span class="helo-summary__label"><?php esc_html_e( 'Mail server', 'helo-smtp' ); ?></span>
-		<div class="helo-summary__value">
-			<?php if ( '' !== $settings['host'] ) : ?>
-				<?php echo esc_html( $settings['host'] ); ?>
-				<small>:<?php echo esc_html( $settings['port'] ); ?></small>
-			<?php else : ?>
-				<small><?php esc_html_e( 'Not configured', 'helo-smtp' ); ?></small>
-			<?php endif; ?>
-		</div>
-	</div>
-	<div class="helo-summary__cell">
-		<span class="helo-summary__label"><?php esc_html_e( 'Sent, last 7 days', 'helo-smtp' ); ?></span>
-		<div class="helo-summary__value"><?php echo esc_html( number_format_i18n( $stats['sent'] ) ); ?></div>
-	</div>
-	<div class="helo-summary__cell">
-		<span class="helo-summary__label"><?php esc_html_e( 'Failed, last 7 days', 'helo-smtp' ); ?></span>
-		<div class="helo-summary__value">
-			<?php if ( $stats['failed'] ) : ?>
-				<a href="<?php echo esc_url( Helo_Admin::url( array( 'tab' => 'logs' ) ) ); ?>" style="color:var(--helo-err);text-decoration:none">
-					<?php echo esc_html( number_format_i18n( $stats['failed'] ) ); ?>
-				</a>
-			<?php else : ?>
-				0
-			<?php endif; ?>
-		</div>
-	</div>
-	<div class="helo-summary__cell">
-		<span class="helo-summary__label"><?php esc_html_e( 'Last email', 'helo-smtp' ); ?></span>
-		<div class="helo-summary__value">
-			<?php if ( $helo_last ) : ?>
-				<span class="helo-badge helo-badge--<?php echo 'sent' === $helo_last->status ? 'ok' : 'err'; ?>">
-					<?php echo esc_html( human_time_diff( mysql2date( 'U', $helo_last->created_at ), current_time( 'timestamp' ) ) ); ?>
-					<?php esc_html_e( 'ago', 'helo-smtp' ); ?>
-				</span>
-			<?php else : ?>
-				<small><?php esc_html_e( 'Nothing yet', 'helo-smtp' ); ?></small>
-			<?php endif; ?>
-		</div>
-	</div>
-</div>
-
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 	<input type="hidden" name="action" value="helo_save">
+	<input type="hidden" name="return_slug" value="<?php echo esc_attr( Helo_Admin::SUB_MAIL ); ?>">
 	<?php wp_nonce_field( 'helo_save' ); ?>
 
 	<div class="helo-card">
@@ -209,102 +167,10 @@ $helo_encryptions = array(
 		</div>
 
 		<div class="helo-card__foot">
-			<p><?php esc_html_e( 'Save first, then test — the test uses what is stored.', 'helo-smtp' ); ?></p>
+			<p><?php esc_html_e( 'Save first, then test — the IMAP test uses what is stored.', 'helo-smtp' ); ?></p>
 			<a class="button" href="<?php echo esc_url( Helo_Imap::test_url() ); ?>">
 				<?php esc_html_e( 'Test IMAP connection', 'helo-smtp' ); ?>
 			</a>
-		</div>
-	</div>
-
-	<div class="helo-card">
-		<div class="helo-card__head">
-			<h2><?php esc_html_e( 'Bot & spam protection (Cloudflare Turnstile)', 'helo-smtp' ); ?></h2>
-			<p><?php esc_html_e( 'A privacy-friendly CAPTCHA from Cloudflare. Get a free site key and secret at dash.cloudflare.com, then choose which forms to protect. Analytics (how many checks pass vs block) appear on the Security tab.', 'helo-smtp' ); ?></p>
-		</div>
-
-		<div class="helo-field">
-			<span class="helo-field__label"><?php esc_html_e( 'Enable Turnstile', 'helo-smtp' ); ?></span>
-			<div class="helo-field__control">
-				<label class="helo-switch">
-					<input name="turnstile_enable" type="checkbox" value="1" <?php checked( $settings['turnstile_enable'] ); ?>>
-					<span><?php esc_html_e( 'Turn on bot protection through Cloudflare Turnstile', 'helo-smtp' ); ?></span>
-				</label>
-			</div>
-		</div>
-
-		<div class="helo-field">
-			<label class="helo-field__label" for="helo-turnstile-site-key"><?php esc_html_e( 'Site key', 'helo-smtp' ); ?></label>
-			<div class="helo-field__control">
-				<input name="turnstile_site_key" id="helo-turnstile-site-key" type="text" value="<?php echo esc_attr( $settings['turnstile_site_key'] ); ?>">
-				<p class="helo-hint"><?php esc_html_e( 'The public key, shown to visitors and safe to embed in your page.', 'helo-smtp' ); ?></p>
-			</div>
-		</div>
-
-		<div class="helo-field">
-			<label class="helo-field__label" for="helo-turnstile-secret-key"><?php esc_html_e( 'Secret key', 'helo-smtp' ); ?></label>
-			<div class="helo-field__control">
-				<input name="turnstile_secret_key" id="helo-turnstile-secret-key" type="password" autocomplete="new-password" value="<?php echo esc_attr( $settings['turnstile_secret_key'] ); ?>">
-				<p class="helo-hint"><?php esc_html_e( 'Sent only from your server to Cloudflare to verify a token. Never shown to visitors.', 'helo-smtp' ); ?></p>
-			</div>
-		</div>
-
-		<div class="helo-field">
-			<span class="helo-field__label"><?php esc_html_e( 'Appearance', 'helo-smtp' ); ?></span>
-			<div class="helo-field__control">
-				<div class="helo-row">
-					<select name="turnstile_theme" style="max-width:200px">
-						<option value="auto" <?php selected( $settings['turnstile_theme'], 'auto' ); ?>><?php esc_html_e( 'Auto theme', 'helo-smtp' ); ?></option>
-						<option value="light" <?php selected( $settings['turnstile_theme'], 'light' ); ?>><?php esc_html_e( 'Light', 'helo-smtp' ); ?></option>
-						<option value="dark" <?php selected( $settings['turnstile_theme'], 'dark' ); ?>><?php esc_html_e( 'Dark', 'helo-smtp' ); ?></option>
-					</select>
-					<select name="turnstile_appearance" style="max-width:260px">
-						<option value="always" <?php selected( $settings['turnstile_appearance'], 'always' ); ?>><?php esc_html_e( 'Always visible', 'helo-smtp' ); ?></option>
-						<option value="interaction-only" <?php selected( $settings['turnstile_appearance'], 'interaction-only' ); ?>><?php esc_html_e( 'Shown only when needed', 'helo-smtp' ); ?></option>
-					</select>
-				</div>
-			</div>
-		</div>
-
-		<div class="helo-field">
-			<span class="helo-field__label"><?php esc_html_e( 'Protect these forms', 'helo-smtp' ); ?></span>
-			<div class="helo-field__control helo-form-protection">
-				<label class="helo-switch"><input type="checkbox" name="turnstile_login" value="1" <?php checked( $settings['turnstile_login'] ); ?>><span><?php esc_html_e( 'Login', 'helo-smtp' ); ?></span></label>
-				<label class="helo-switch"><input type="checkbox" name="turnstile_register" value="1" <?php checked( $settings['turnstile_register'] ); ?>><span><?php esc_html_e( 'Registration', 'helo-smtp' ); ?></span></label>
-				<label class="helo-switch"><input type="checkbox" name="turnstile_reset" value="1" <?php checked( $settings['turnstile_reset'] ); ?>><span><?php esc_html_e( 'Lost password', 'helo-smtp' ); ?></span></label>
-				<label class="helo-switch"><input type="checkbox" name="turnstile_comments" value="1" <?php checked( $settings['turnstile_comments'] ); ?>><span><?php esc_html_e( 'Comments', 'helo-smtp' ); ?></span></label>
-				<label class="helo-switch"><input type="checkbox" name="turnstile_woo" value="1" <?php checked( $settings['turnstile_woo'] ); ?>><span><?php esc_html_e( 'WooCommerce', 'helo-smtp' ); ?></span></label>
-				<label class="helo-switch"><input type="checkbox" name="turnstile_cf7" value="1" <?php checked( $settings['turnstile_cf7'] ); ?>><span><?php esc_html_e( 'Contact Form 7', 'helo-smtp' ); ?></span></label>
-			</div>
-		</div>
-
-		<div class="helo-card__foot"><p><?php esc_html_e( 'Comments are blocked with no exceptions when the feature is on and keys are set.', 'helo-smtp' ); ?></p></div>
-	</div>
-
-	<div class="helo-card">
-		<div class="helo-card__head">
-			<h2><?php esc_html_e( 'Security analytics', 'helo-smtp' ); ?></h2>
-			<p><?php esc_html_e( 'What the Security tab records.', 'helo-smtp' ); ?></p>
-		</div>
-
-		<div class="helo-field">
-			<span class="helo-field__label"><?php esc_html_e( 'Counters', 'helo-smtp' ); ?></span>
-			<div class="helo-field__control">
-				<label class="helo-switch">
-					<input name="turnstile_analytics" type="checkbox" value="1" <?php checked( $settings['turnstile_analytics'] ); ?>>
-					<span><?php esc_html_e( 'Record verified / blocked totals (no IPs or page URLs stored)', 'helo-smtp' ); ?></span>
-				</label>
-			</div>
-		</div>
-
-		<div class="helo-field">
-			<span class="helo-field__label"><?php esc_html_e( 'Debug log', 'helo-smtp' ); ?></span>
-			<div class="helo-field__control">
-				<label class="helo-switch">
-					<input name="turnstile_debug_log" type="checkbox" value="1" <?php checked( $settings['turnstile_debug_log'] ); ?>>
-					<span><?php esc_html_e( 'Log each check with IP and page URL (last 50) — for troubleshooting', 'helo-smtp' ); ?></span>
-				</label>
-				<p class="helo-hint"><?php esc_html_e( 'Stores identifying data. Leave off unless you are diagnosing a problem.', 'helo-smtp' ); ?></p>
-			</div>
 		</div>
 	</div>
 
