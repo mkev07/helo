@@ -53,6 +53,19 @@ up in your normal mail client alongside everything else.
 - **Never blocks or fails a send.** The mail has already gone out by the time this runs.
 - Off by default, since it adds one IMAP round trip.
 
+### Bot & spam protection
+
+Protect your site's forms from bots with Cloudflare Turnstile — the privacy-friendly
+CAPTCHA that keeps the signal about whether someone is human on the visitor's device,
+so no cookies or visitor data cross over to your server.
+
+- One settings screen for your **site key** and **secret key**, plus theme and when the widget shows.
+- Protects **login, registration, lost-password, comments, WooCommerce, and Contact Form 7** forms.
+- **Comments are blocked with no exceptions** when the feature is on and keys are set.
+- A **Security screen** shows how it's going: verified vs blocked totals, a per-form breakdown, and the top block reasons.
+- **Turnstile tokens are single-use** and verified on the server (with the visitor's IP), so a captured token can't be replayed.
+- The optional **debug log** (off by default) records the IP and page behind each blocked check for troubleshooting.
+
 ### Updates
 
 Self-hosted. Updates arrive on the Plugins screen like any other, without being
