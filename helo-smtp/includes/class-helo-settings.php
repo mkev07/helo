@@ -63,6 +63,7 @@ class Helo_Settings {
 			'turnstile_gravity'     => 0,
 			'turnstile_kadence'     => 0,
 			'turnstile_sureforms'   => 0,
+			'turnstile_elementor'   => 0,
 			'turnstile_analytics'   => 1,
 			'turnstile_debug_log'   => 0,
 		);
@@ -155,6 +156,7 @@ class Helo_Settings {
 			'turnstile_gravity'    => empty( $input['turnstile_gravity'] ) ? 0 : 1,
 			'turnstile_kadence'    => empty( $input['turnstile_kadence'] ) ? 0 : 1,
 			'turnstile_sureforms'  => empty( $input['turnstile_sureforms'] ) ? 0 : 1,
+			'turnstile_elementor'  => empty( $input['turnstile_elementor'] ) ? 0 : 1,
 			'turnstile_analytics'  => empty( $input['turnstile_analytics'] ) ? 0 : 1,
 			'turnstile_debug_log'  => empty( $input['turnstile_debug_log'] ) ? 0 : 1,
 		);

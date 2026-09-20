@@ -97,6 +97,7 @@ defined( 'ABSPATH' ) || exit;
 				<label class="helo-switch"><input type="checkbox" name="turnstile_gravity" value="1" <?php checked( $settings['turnstile_gravity'] ); ?>><span><?php esc_html_e( 'Gravity Forms', 'helo-smtp' ); ?></span></label>
 				<label class="helo-switch"><input type="checkbox" name="turnstile_kadence" value="1" <?php checked( $settings['turnstile_kadence'] ); ?>><span><?php esc_html_e( 'Kadence blocks', 'helo-smtp' ); ?></span></label>
 				<label class="helo-switch"><input type="checkbox" name="turnstile_sureforms" value="1" <?php checked( $settings['turnstile_sureforms'] ); ?>><span><?php esc_html_e( 'SureForms', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_elementor" value="1" <?php checked( $settings['turnstile_elementor'] ); ?>><span><?php esc_html_e( 'Elementor Pro forms', 'helo-smtp' ); ?></span></label>
 			</div>
 		</div>
 
