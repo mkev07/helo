@@ -13,6 +13,8 @@ wp_clear_scheduled_hook( 'helo_purge_logs' );
 
 delete_option( 'helo_settings' );
 delete_option( 'helo_db_version' );
+delete_option( 'helo_turnstile_analytics' );
+delete_option( 'helo_turnstile_debug_log' );
 delete_transient( 'helo_notice' );
 delete_transient( 'helo_sent_folder' );
 delete_site_transient( 'helo_update_manifest' );
