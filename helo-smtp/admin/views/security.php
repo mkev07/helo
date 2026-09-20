@@ -89,6 +89,14 @@ defined( 'ABSPATH' ) || exit;
 				<label class="helo-switch"><input type="checkbox" name="turnstile_comments" value="1" <?php checked( $settings['turnstile_comments'] ); ?>><span><?php esc_html_e( 'Comments', 'helo-smtp' ); ?></span></label>
 				<label class="helo-switch"><input type="checkbox" name="turnstile_woo" value="1" <?php checked( $settings['turnstile_woo'] ); ?>><span><?php esc_html_e( 'WooCommerce', 'helo-smtp' ); ?></span></label>
 				<label class="helo-switch"><input type="checkbox" name="turnstile_cf7" value="1" <?php checked( $settings['turnstile_cf7'] ); ?>><span><?php esc_html_e( 'Contact Form 7', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_wpforms" value="1" <?php checked( $settings['turnstile_wpforms'] ); ?>><span><?php esc_html_e( 'WPForms', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_forminator" value="1" <?php checked( $settings['turnstile_forminator'] ); ?>><span><?php esc_html_e( 'Forminator', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_fluent" value="1" <?php checked( $settings['turnstile_fluent'] ); ?>><span><?php esc_html_e( 'Fluent Forms', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_formidable" value="1" <?php checked( $settings['turnstile_formidable'] ); ?>><span><?php esc_html_e( 'Formidable', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_jetpack" value="1" <?php checked( $settings['turnstile_jetpack'] ); ?>><span><?php esc_html_e( 'Jetpack form', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_gravity" value="1" <?php checked( $settings['turnstile_gravity'] ); ?>><span><?php esc_html_e( 'Gravity Forms', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_kadence" value="1" <?php checked( $settings['turnstile_kadence'] ); ?>><span><?php esc_html_e( 'Kadence blocks', 'helo-smtp' ); ?></span></label>
+				<label class="helo-switch"><input type="checkbox" name="turnstile_sureforms" value="1" <?php checked( $settings['turnstile_sureforms'] ); ?>><span><?php esc_html_e( 'SureForms', 'helo-smtp' ); ?></span></label>
 			</div>
 		</div>
 
