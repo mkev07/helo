@@ -72,7 +72,8 @@ class Helo_Admin {
 	public static function action_links( $links ) {
 		array_unshift(
 			$links,
-			sprintf( '<a href="%s">%s</a>', esc_url( self::url() ), esc_html__( 'Settings', 'helo-smtp' ) )
+			sprintf( '<a href="%s">%s</a>', esc_url( self::url() ), esc_html__( 'Settings', 'helo-smtp' ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( Helo_Updater::check_url() ), esc_html__( 'Check for updates', 'helo-smtp' ) )
 		);
 
 		return $links;
