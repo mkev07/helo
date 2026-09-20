@@ -9,6 +9,11 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+	<input type="hidden" name="action" value="helo_save">
+	<input type="hidden" name="return_slug" value="<?php echo esc_attr( Helo_Admin::SUB_SECURITY ); ?>">
+	<?php wp_nonce_field( 'helo_save' ); ?>
+
 <div class="helo-card">
 	<div class="helo-card__head">
 		<h2><?php esc_html_e( 'Cloudflare Turnstile', 'helo-smtp' ); ?></h2>
@@ -69,12 +74,7 @@ defined( 'ABSPATH' ) || exit;
 	</div>
 </div>
 
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<input type="hidden" name="action" value="helo_save">
-	<input type="hidden" name="return_slug" value="<?php echo esc_attr( Helo_Admin::SUB_SECURITY ); ?>">
-	<?php wp_nonce_field( 'helo_save' ); ?>
-
-	<div class="helo-card">
+<div class="helo-card">
 		<div class="helo-card__head">
 			<h2><?php esc_html_e( 'Protect these forms', 'helo-smtp' ); ?></h2>
 			<p><?php esc_html_e( 'Which forms require a passing Turnstile check before they submit.', 'helo-smtp' ); ?></p>
@@ -125,7 +125,8 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 
 		<div class="helo-card__foot">
-			<?php submit_button( __( 'Save analytics settings', 'helo-smtp' ), 'secondary', 'submit', false ); ?>
+			<p><?php esc_html_e( 'Save once to apply the keys, the forms they protect, and the analytics settings.', 'helo-smtp' ); ?></p>
+			<?php submit_button( __( 'Save bot protection', 'helo-smtp' ), 'primary', 'submit', false ); ?>
 		</div>
 	</div>
 </form>
