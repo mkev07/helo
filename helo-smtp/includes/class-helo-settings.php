@@ -22,7 +22,7 @@ class Helo_Settings {
 	private static $cache = null;
 
 	public static function defaults() {
-		return array(
+		$defaults = array(
 			'host'       => '',
 			'port'       => 587,
 			'encryption' => 'tls',
@@ -47,26 +47,34 @@ class Helo_Settings {
 			'turnstile_enable'      => 0,
 			'turnstile_site_key'    => '',
 			'turnstile_secret_key'  => '',
+
+			// Widget presentation.
 			'turnstile_theme'       => 'auto',
 			'turnstile_appearance'  => 'always',
-			'turnstile_login'       => 0,
-			'turnstile_register'    => 0,
-			'turnstile_reset'       => 0,
-			'turnstile_comments'    => 0,
-			'turnstile_woo'         => 0,
-			'turnstile_cf7'         => 0,
-			'turnstile_wpforms'     => 0,
-			'turnstile_forminator'  => 0,
-			'turnstile_fluent'      => 0,
-			'turnstile_formidable'  => 0,
-			'turnstile_jetpack'     => 0,
-			'turnstile_gravity'     => 0,
-			'turnstile_kadence'     => 0,
-			'turnstile_sureforms'   => 0,
-			'turnstile_elementor'   => 0,
+			'turnstile_size'        => 'normal',
+			'turnstile_language'    => 'auto',
+			'turnstile_label'       => '',
+			'turnstile_hold_submit' => 1,
+			'turnstile_message'     => '',
+
+			// What happens when Cloudflare cannot be reached.
+			'turnstile_failsafe'    => 'allow',
+
+			// Who skips the check.
+			'turnstile_skip_users'  => 0,
+			'turnstile_skip_ips'    => '',
+			'turnstile_skip_agents' => '',
+
 			'turnstile_analytics'   => 1,
 			'turnstile_debug_log'   => 0,
 		);
+
+		// Every protectable surface, off by default.
+		foreach ( Helo_Integrations::setting_keys() as $key ) {
+			$defaults[ $key ] = 0;
+		}
+
+		return $defaults;
 	}
 
 	/**
@@ -137,29 +145,33 @@ class Helo_Settings {
 			'imap_encryption' => in_array( isset( $input['imap_encryption'] ) ? $input['imap_encryption'] : '', array( 'ssl', 'tls' ), true ) ? $input['imap_encryption'] : 'ssl',
 			'imap_folder'     => sanitize_text_field( isset( $input['imap_folder'] ) ? $input['imap_folder'] : '' ),
 
-			'turnstile_enable'     => empty( $input['turnstile_enable'] ) ? 0 : 1,
-			'turnstile_site_key'   => sanitize_text_field( isset( $input['turnstile_site_key'] ) ? $input['turnstile_site_key'] : '' ),
-			'turnstile_secret_key' => sanitize_text_field( isset( $input['turnstile_secret_key'] ) ? $input['turnstile_secret_key'] : '' ),
-			'turnstile_theme'      => in_array( isset( $input['turnstile_theme'] ) ? $input['turnstile_theme'] : '', array( 'auto', 'light', 'dark' ), true ) ? $input['turnstile_theme'] : 'auto',
-			'turnstile_appearance' => in_array( isset( $input['turnstile_appearance'] ) ? $input['turnstile_appearance'] : '', array( 'always', 'interaction-only' ), true ) ? $input['turnstile_appearance'] : 'always',
-			'turnstile_login'      => empty( $input['turnstile_login'] ) ? 0 : 1,
-			'turnstile_register'   => empty( $input['turnstile_register'] ) ? 0 : 1,
-			'turnstile_reset'      => empty( $input['turnstile_reset'] ) ? 0 : 1,
-			'turnstile_comments'   => empty( $input['turnstile_comments'] ) ? 0 : 1,
-			'turnstile_woo'        => empty( $input['turnstile_woo'] ) ? 0 : 1,
-			'turnstile_cf7'        => empty( $input['turnstile_cf7'] ) ? 0 : 1,
-			'turnstile_wpforms'    => empty( $input['turnstile_wpforms'] ) ? 0 : 1,
-			'turnstile_forminator' => empty( $input['turnstile_forminator'] ) ? 0 : 1,
-			'turnstile_fluent'     => empty( $input['turnstile_fluent'] ) ? 0 : 1,
-			'turnstile_formidable' => empty( $input['turnstile_formidable'] ) ? 0 : 1,
-			'turnstile_jetpack'    => empty( $input['turnstile_jetpack'] ) ? 0 : 1,
-			'turnstile_gravity'    => empty( $input['turnstile_gravity'] ) ? 0 : 1,
-			'turnstile_kadence'    => empty( $input['turnstile_kadence'] ) ? 0 : 1,
-			'turnstile_sureforms'  => empty( $input['turnstile_sureforms'] ) ? 0 : 1,
-			'turnstile_elementor'  => empty( $input['turnstile_elementor'] ) ? 0 : 1,
-			'turnstile_analytics'  => empty( $input['turnstile_analytics'] ) ? 0 : 1,
-			'turnstile_debug_log'  => empty( $input['turnstile_debug_log'] ) ? 0 : 1,
+			'turnstile_enable'      => empty( $input['turnstile_enable'] ) ? 0 : 1,
+			'turnstile_site_key'    => sanitize_text_field( isset( $input['turnstile_site_key'] ) ? $input['turnstile_site_key'] : '' ),
+			'turnstile_secret_key'  => sanitize_text_field( isset( $input['turnstile_secret_key'] ) ? $input['turnstile_secret_key'] : '' ),
+
+			'turnstile_theme'       => self::one_of( $input, 'turnstile_theme', array( 'auto', 'light', 'dark' ), 'auto' ),
+			'turnstile_appearance'  => self::one_of( $input, 'turnstile_appearance', array( 'always', 'interaction-only' ), 'always' ),
+			'turnstile_size'        => self::one_of( $input, 'turnstile_size', array( 'normal', 'flexible', 'compact' ), 'normal' ),
+			'turnstile_language'    => preg_replace( '/[^a-zA-Z\-]/', '', (string) ( isset( $input['turnstile_language'] ) ? $input['turnstile_language'] : 'auto' ) ),
+			'turnstile_label'       => sanitize_text_field( isset( $input['turnstile_label'] ) ? $input['turnstile_label'] : '' ),
+			'turnstile_hold_submit' => empty( $input['turnstile_hold_submit'] ) ? 0 : 1,
+			'turnstile_message'     => sanitize_text_field( isset( $input['turnstile_message'] ) ? $input['turnstile_message'] : '' ),
+
+			'turnstile_failsafe'    => self::one_of( $input, 'turnstile_failsafe', array( 'allow', 'block' ), 'allow' ),
+
+			'turnstile_skip_users'  => empty( $input['turnstile_skip_users'] ) ? 0 : 1,
+			'turnstile_skip_ips'    => self::clean_list( isset( $input['turnstile_skip_ips'] ) ? $input['turnstile_skip_ips'] : '' ),
+			'turnstile_skip_agents' => self::clean_list( isset( $input['turnstile_skip_agents'] ) ? $input['turnstile_skip_agents'] : '' ),
+
+			'turnstile_analytics'   => empty( $input['turnstile_analytics'] ) ? 0 : 1,
+			'turnstile_debug_log'   => empty( $input['turnstile_debug_log'] ) ? 0 : 1,
 		);
+
+		// Integration toggles come straight from the registry, so a new entry
+		// there is saved without touching this method.
+		foreach ( Helo_Integrations::setting_keys() as $key ) {
+			$clean[ $key ] = empty( $input[ $key ] ) ? 0 : 1;
+		}
 
 		$submitted = isset( $input['password'] ) ? (string) $input['password'] : '';
 
@@ -174,6 +186,47 @@ class Helo_Settings {
 
 		// A changed host or folder invalidates the discovered Sent folder.
 		delete_transient( Helo_Imap::FOLDER_CACHE );
+	}
+
+	/**
+	 * Pick a value only if it is one of the allowed ones.
+	 *
+	 * @param array  $input    Raw input.
+	 * @param string $key      Field name.
+	 * @param array  $allowed  Permitted values.
+	 * @param string $fallback Value to use otherwise.
+	 * @return string
+	 */
+	private static function one_of( array $input, $key, array $allowed, $fallback ) {
+		$value = isset( $input[ $key ] ) ? (string) $input[ $key ] : '';
+
+		return in_array( $value, $allowed, true ) ? $value : $fallback;
+	}
+
+	/**
+	 * Tidy a newline-separated list: trim, drop blanks, cap the length.
+	 *
+	 * Pure — tested.
+	 *
+	 * @param string $value Raw textarea contents.
+	 * @return string
+	 */
+	public static function clean_list( $value ) {
+		$lines = preg_split( '/[\r\n]+/', (string) $value );
+		$out   = array();
+
+		foreach ( $lines as $line ) {
+			$line = sanitize_text_field( trim( $line ) );
+
+			if ( '' !== $line ) {
+				$out[] = $line;
+			}
+		}
+
+		// A runaway paste should not bloat the options table.
+		$out = array_slice( array_unique( $out ), 0, 200 );
+
+		return implode( "\n", $out );
 	}
 
 	/* ------------------------------------------------------------------

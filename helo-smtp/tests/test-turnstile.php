@@ -86,7 +86,31 @@ function wp_remote_retrieve_body( $response ) {
 	return isset( $response['body'] ) ? $response['body'] : '';
 }
 
+function is_user_logged_in(  ) {
+	return false;
+}
+function apply_filters( $t, $v ) {
+	return $v;
+}
+function wp_validate_auth_cookie( $c = '', $s = '' ) {
+	return false;
+}
+function wp_remote_retrieve_response_code( $r ) {
+	return isset( $r['response']['code'] ) ? $r['response']['code'] : 200;
+}
+function wp_unslash( $v ) {
+	return $v;
+}
+function __( $t, $d = null ) {
+	return $t;
+}
+function wp_list_pluck( $list, $field ) {
+	return array_map( function ( $i ) use ( $field ) { return $i[ $field ]; }, $list );
+}
+
+require_once dirname( __DIR__ ) . '/includes/class-helo-integrations.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-settings.php';
+require_once dirname( __DIR__ ) . '/includes/class-helo-exemptions.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-turnstile.php';
 
 // Configure Helo with a stub site + secret key so enabled() passes.

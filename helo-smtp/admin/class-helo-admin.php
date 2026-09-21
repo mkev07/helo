@@ -214,14 +214,14 @@ class Helo_Admin {
 		}
 		?>
 		<div class="helo-head">
-			<div>
+			<div class="helo-head__text">
 				<h1><?php echo esc_html( $title ); ?></h1>
 				<?php if ( '' !== $subtitle ) : ?>
 					<p><?php echo esc_html( $subtitle ); ?></p>
 				<?php endif; ?>
 			</div>
 			<?php if ( ! empty( $badges ) ) : ?>
-				<div class="helo-row"><?php foreach ( $badges as $helo_b ) : ?><span class="helo-badge helo-badge--<?php echo esc_attr( $helo_b[0] ); ?>"><?php echo esc_html( $helo_b[1] ); ?></span><?php endforeach; ?></div>
+				<div class="helo-head__aside"><?php foreach ( $badges as $helo_b ) : ?><span class="helo-badge helo-badge--<?php echo esc_attr( $helo_b[0] ); ?>"><?php echo esc_html( $helo_b[1] ); ?></span><?php endforeach; ?></div>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -239,12 +239,16 @@ class Helo_Admin {
 		);
 		self::print_notice();
 
+		$settings = Helo_Settings::all();
+
 		Helo_Admin::view(
 			'dashboard',
 			array(
-				'settings' => Helo_Settings::all(),
-				'stats'    => Helo_Logger::stats(),
+				'settings'   => $settings,
+				'stats'      => Helo_Logger::stats(),
 				'mail_count' => Helo_Logger::count(),
+				'analytics'  => Helo_Analytics::snapshot(),
+				'summary'    => Helo_Integrations::summary( $settings ),
 			)
 		);
 
@@ -299,10 +303,14 @@ class Helo_Admin {
 		);
 		self::print_notice();
 
+		$settings = Helo_Settings::all();
+
 		Helo_Admin::view(
 			'security',
 			array(
-				'settings' => Helo_Settings::all(),
+				'settings'     => $settings,
+				'integrations' => Helo_Integrations::grouped( $settings ),
+				'summary'      => Helo_Integrations::summary( $settings ),
 			)
 		);
 

@@ -34,6 +34,34 @@ $GLOBALS['options'] = array(
 		'copy_to_sent'    => 1,
 		'imap_port'       => 993,
 		'imap_encryption' => 'ssl',
+		'turnstile_enable'     => 1,
+		'turnstile_site_key'   => '0x4AAAAAAA_example_site_key',
+		'turnstile_secret_key' => 'secret',
+		'turnstile_theme'      => 'auto',
+		'turnstile_appearance' => 'always',
+		'turnstile_login'      => 1,
+		'turnstile_register'   => 1,
+		'turnstile_comments'   => 1,
+		'turnstile_cf7'        => 1,
+		'turnstile_elementor'  => 1,
+		'turnstile_analytics'  => 1,
+	),
+	'helo_turnstile_analytics' => array(
+		'started' => '2026-08-14 09:00:00',
+		'updated' => '2026-09-21 14:02:11',
+		'total' => 4821, 'verified' => 4390, 'blocked' => 431, 'retries' => 52,
+		'forms' => array(
+			'wordpress-login'  => array( 'label' => 'wordpress-login', 'total' => 2140, 'verified' => 2088, 'blocked' => 52, 'retries' => 11, 'last_checked' => '2026-09-21 14:02:11' ),
+			'wordpress-comment'=> array( 'label' => 'wordpress-comment', 'total' => 1402, 'verified' => 1075, 'blocked' => 327, 'retries' => 22, 'last_checked' => '2026-09-21 13:48:02' ),
+			'contact-form-7'   => array( 'label' => 'contact-form-7', 'total' => 806, 'verified' => 781, 'blocked' => 25, 'retries' => 9, 'last_checked' => '2026-09-21 12:11:40' ),
+			'form-elementor'   => array( 'label' => 'form-elementor', 'total' => 473, 'verified' => 446, 'blocked' => 27, 'retries' => 10, 'last_checked' => '2026-09-20 18:33:07' ),
+		),
+		'errors' => array( 'timeout-or-duplicate' => 214, 'invalid-input-response' => 155, 'missing-input-response' => 62 ),
+	),
+	'helo_turnstile_debug_log' => array(
+		array( 'date' => '2026-09-21 14:02:11', 'success' => true,  'error' => '',                        'ip' => '102.117.44.9',  'page' => '/wp-login.php' ),
+		array( 'date' => '2026-09-21 13:48:02', 'success' => false, 'error' => 'invalid-input-response',   'ip' => '45.83.220.14',  'page' => '/blog/hello-world/' ),
+		array( 'date' => '2026-09-21 12:11:40', 'success' => true,  'error' => '',                        'ip' => '196.20.11.87',  'page' => '/contact/' ),
 	),
 );
 
@@ -52,6 +80,15 @@ function get_transient( $n ) { return $GLOBALS['transient'] ?? false; }
 function set_transient( $n, $v, $t = 0 ) { $GLOBALS['transient'] = $v; }
 function delete_transient( $n ) { unset( $GLOBALS['transient'] ); }
 function wp_next_scheduled( $h ) { return false; }
+function absint( $v ) { return abs( (int) $v ); }
+function sanitize_key( $v ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $v ) ); }
+function add_shortcode() {}
+function wp_rand( $a = 0, $b = 999999 ) { return random_int( $a, $b ); }
+function wp_script_is() { return false; }
+function did_action() { return false; }
+function wp_doing_ajax() { return false; }
+function get_file_data( $f, $fields ) { return array( 'uri' => 'https://github.com/mkev07/helo/releases/latest/download/update.json' ); }
+function wp_parse_url( $u, $c = -1 ) { return parse_url( $u, $c ); }
 function get_site_transient( $n ) { return false; }
 function wp_parse_args( $a, $d ) { return array_merge( $d, (array) $a ); }
 function sanitize_text_field( $v ) { return trim( strip_tags( (string) $v ) ); }
@@ -62,6 +99,10 @@ function esc_url( $v ) { return htmlspecialchars( (string) $v, ENT_QUOTES, 'UTF-
 function esc_url_raw( $v ) { return $v; }
 function esc_js( $v ) { return addslashes( (string) $v ); }
 function esc_textarea( $v ) { return esc_html( $v ); }
+function is_user_logged_in() { return false; }
+function apply_filters( $t, $v ) { return $v; }
+function date_i18n( $f, $t ) { return gmdate( $f, $t ); }
+function wp_list_pluck( $list, $field ) { return array_map( function ( $i ) use ( $field ) { return $i[ $field ]; }, $list ); }
 function wp_kses( $v ) { return $v; }
 function wp_kses_post( $v ) { return $v; }
 function __( $t, $d = null ) { return $t; }
@@ -71,7 +112,7 @@ function esc_attr__( $t, $d = null ) { return esc_attr( $t ); }
 function esc_html_e( $t, $d = null ) { echo esc_html( $t ); }
 function esc_attr_e( $t, $d = null ) { echo esc_attr( $t ); }
 function number_format_i18n( $n ) { return number_format( (float) $n ); }
-function human_time_diff( $from, $to ) { return round( ( $to - $from ) / 60 ) . ' mins'; }
+function human_time_diff( $from, $to ) { return round( abs( $to - $from ) / 60 ) . ' mins'; }
 function current_time( $type ) { return 'timestamp' === $type ? time() : gmdate( 'Y-m-d H:i:s' ); }
 function mysql2date( $format, $date ) { return 'U' === $format ? strtotime( $date ) : gmdate( $format, strtotime( $date ) ); }
 function admin_url( $p = '' ) { return '#' . $p; }
@@ -100,7 +141,9 @@ function paginate_links( $args ) {
 	return $out . '<span class="page-numbers dots">&hellip;</span><a class="page-numbers" href="#">&rarr;</a>';
 }
 
+require_once HELO_PATH . 'includes/class-helo-integrations.php';
 require_once HELO_PATH . 'includes/class-helo-settings.php';
+require_once HELO_PATH . 'includes/class-helo-exemptions.php';
 require_once HELO_PATH . 'includes/class-helo-imap.php';
 
 // --- Fixture data ---------------------------------------------------------
@@ -179,41 +222,38 @@ class Helo_Logger {
 	}
 }
 
-class Helo_Updater {
-	public static function uri() { return 'https://raw.githubusercontent.com/x/y/main/update.json'; }
-	public static function check_url() { return '#check'; }
-}
 
+require_once HELO_PATH . 'includes/class-helo-turnstile.php';
+require_once HELO_PATH . 'includes/class-helo-analytics.php';
+require_once HELO_PATH . 'includes/class-helo-updater.php';
 require_once HELO_PATH . 'admin/class-helo-admin.php';
 
 // --- Render ---------------------------------------------------------------
 
 $screens = array(
-	'settings' => array(),
-	'logs'     => array( 'tab' => 'logs' ),
-	'single'   => array( 'tab' => 'logs', 'log' => 118 ),
-	'empty'    => array( 'tab' => 'logs' ),
-	'fresh'    => array(),
+	'dashboard' => array( 'render_dashboard', array() ),
+	'mail'      => array( 'render_mail', array() ),
+	'logs'      => array( 'render_logs', array() ),
+	'message'   => array( 'render_logs', array( 'log' => 118 ) ),
+	'security'  => array( 'render_security', array() ),
+	'analytics' => array( 'render_analytics', array() ),
+	'empty'     => array( 'render_logs', array() ),
 );
 
-foreach ( $screens as $name => $query ) {
+foreach ( $screens as $name => $screen ) {
+	list( $method, $query ) = $screen;
 	$_GET = $query;
 
-	Helo_Logger::$empty = in_array( $name, array( 'empty', 'fresh' ), true );
-	if ( 'fresh' === $name ) {
-		$GLOBALS['options']['helo_settings']['host'] = '';
-		Helo_Settings::save( array( 'password' => Helo_Settings::UNCHANGED ) );
-	}
+	Helo_Logger::$empty = ( 'empty' === $name );
 
-	if ( 'settings' === $name ) {
-		$GLOBALS['transient'] = array( 'type' => 'success', 'message' => 'Test email accepted by the mail server. Check the inbox, and the spam folder.' );
-	}
+	$GLOBALS['transient'] = ( 'mail' === $name )
+		? array( 'type' => 'success', 'message' => 'Test email accepted by the mail server. Check the inbox, and the spam folder.' )
+		: false;
 
 	ob_start();
-	Helo_Admin::render();
+	Helo_Admin::$method();
 	$body = ob_get_clean();
 
-	// Inlined, because the preview pane serves these as standalone snapshots.
 	$css = file_get_contents( __DIR__ . '/wp-base.css' )
 		. file_get_contents( HELO_PATH . 'admin/css/admin.css' );
 
