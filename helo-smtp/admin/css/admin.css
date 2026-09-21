@@ -1,29 +1,70 @@
 /**
- * Admin styling.
+ * Helo admin design system.
  *
- * Card/badge/switch shapes borrowed from shadcn, colours and controls kept in
- * WordPress's palette. Buttons deliberately reuse core .button classes so they
- * follow whatever admin colour scheme the user picked.
+ * shadcn's shapes — a token scale, soft elevation, hairline borders, generous
+ * padding and one focus ring — expressed in WordPress's palette so the screens
+ * sit inside wp-admin rather than fighting it.
+ *
+ * Buttons deliberately reuse core's .button classes so they follow whichever
+ * admin colour scheme the user picked. Everything else is ours, scoped under
+ * .helo-app to keep it out of the rest of wp-admin.
  *
  * @package Helo
  */
 
-.helo-app {
-	--helo-fg: #1d2327;
-	--helo-muted: #646970;
-	--helo-border: #e2e2e5;
-	--helo-border-strong: #c3c4c7;
-	--helo-surface: #fff;
-	--helo-subtle: #f6f7f7;
-	--helo-accent: #2271b1;
-	--helo-ok: #007a1f;
-	--helo-err: #b32d2e;
-	--helo-radius: 8px;
-	--helo-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 1px 3px rgba(0, 0, 0, .05);
+/* ============================================================== 1. tokens */
 
-	max-width: 1400px;
-	margin-right: 20px;
-	color: var(--helo-fg);
+.helo-app {
+	/* Neutrals */
+	--helo-surface: #fff;
+	--helo-raised: #fafbfc;
+	--helo-line: #e5e7eb;
+	--helo-line-strong: #d3d7de;
+
+	--helo-text: #111827;
+	--helo-muted: #61697a;
+	--helo-faint: #9aa1ae;
+
+	/* Accent: WordPress blue, so we sit beside core controls */
+	--helo-accent: #2271b1;
+	--helo-accent-hover: #135e96;
+	--helo-accent-wash: #f0f6fc;
+	--helo-accent-line: #cfe2f3;
+
+	/* Status */
+	--helo-ok: #0a7c42;
+	--helo-ok-wash: #edfaf1;
+	--helo-ok-line: #b3e6c6;
+
+	--helo-warn: #9a5b06;
+	--helo-warn-wash: #fff8ea;
+	--helo-warn-line: #f5d99b;
+
+	--helo-err: #b32d2e;
+	--helo-err-wash: #fdf2f2;
+	--helo-err-line: #f2c3c3;
+
+	/* Shape */
+	--helo-r-sm: 6px;
+	--helo-r: 10px;
+	--helo-r-pill: 999px;
+
+	/* Elevation — two layers, kept very soft */
+	--helo-shadow: 0 1px 2px rgba(17, 24, 39, .04), 0 1px 3px rgba(17, 24, 39, .06);
+	--helo-shadow-md: 0 2px 4px rgba(17, 24, 39, .04), 0 8px 16px -6px rgba(17, 24, 39, .1);
+
+	--helo-ring: 0 0 0 3px rgba(34, 113, 177, .18);
+
+	/* Rhythm */
+	--helo-gap: 20px;
+	--helo-pad: 22px;
+
+	max-width: 1360px;
+	margin: 0 20px 0 0;
+	color: var(--helo-text);
+	font-size: 13px;
+	line-height: 1.55;
+	-webkit-font-smoothing: antialiased;
 }
 
 .helo-app *,
@@ -32,7 +73,29 @@
 	box-sizing: border-box;
 }
 
-/* ----------------------------------------------------------------- header */
+.helo-app h1,
+.helo-app h2,
+.helo-app h3 {
+	margin: 0;
+	padding: 0;
+	color: var(--helo-text);
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.helo-app p {
+	margin: 0;
+}
+
+.helo-app a {
+	color: var(--helo-accent);
+}
+
+.helo-app a:hover {
+	color: var(--helo-accent-hover);
+}
+
+/* ============================================================== 2. header */
 
 .helo-head {
 	display: flex;
@@ -40,144 +103,51 @@
 	justify-content: space-between;
 	gap: 16px;
 	flex-wrap: wrap;
-	margin: 8px 0 20px;
+	padding: 4px 0 18px;
 }
 
-.helo-head h1 {
-	margin: 0 0 4px;
-	padding: 0;
-	font-size: 23px;
-	font-weight: 600;
-	line-height: 1.3;
-}
-
-.helo-head p {
-	margin: 0;
-	color: var(--helo-muted);
-	font-size: 13px;
-}
-
-/* ----------------------------------------------------------- dashboard */
-
-.helo-dash-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: 16px;
-	margin: 0 0 20px;
-}
-
-.helo-dash-card .helo-card__head h2 .dashicons {
-	margin-right: 6px;
-	color: var(--helo-accent);
-	position: relative;
-	top: 2px;
-}
-
-.helo-dash-summary {
-	margin: 0 0 24px;
-}
-
-.helo-quicklinks .helo-row {
-	flex-wrap: wrap;
-	gap: 8px;
-}
-
-/* ------------------------------------------------------------------ cards */
-
-.helo-card {
-	background: var(--helo-surface);
-	border: 1px solid var(--helo-border);
-	border-radius: var(--helo-radius);
-	box-shadow: var(--helo-shadow);
-	margin-bottom: 20px;
-	overflow: hidden;
-}
-
-.helo-card__head {
-	padding: 18px 24px;
-	border-bottom: 1px solid var(--helo-border);
-}
-
-.helo-card__head--split {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	gap: 16px;
-	flex-wrap: wrap;
-}
-
-.helo-card__head h2 {
-	margin: 0;
-	padding: 0;
-	font-size: 15px;
-	font-weight: 600;
-	line-height: 1.4;
-}
-
-.helo-card__head p {
-	margin: 4px 0 0;
-	color: var(--helo-muted);
-	font-size: 13px;
-	line-height: 1.5;
-}
-
-.helo-card__foot {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	flex-wrap: wrap;
-	padding: 14px 24px;
-	background: var(--helo-subtle);
-	border-top: 1px solid var(--helo-border);
-}
-
-.helo-card__foot p {
-	margin: 0;
-	color: var(--helo-muted);
-	font-size: 12px;
-}
-
-/* ----------------------------------------------------------------- fields */
-
-.helo-field {
-	display: grid;
-	grid-template-columns: 210px minmax(0, 1fr);
-	gap: 4px 20px;
-	padding: 16px 24px;
-	border-top: 1px solid var(--helo-border);
-}
-
-.helo-card__head + .helo-field,
-.helo-card > form > .helo-field:first-child,
-.helo-field:first-child {
-	border-top: 0;
-}
-
-.helo-field > label:first-child,
-.helo-field__label {
-	padding-top: 7px;
-	font-size: 13px;
-	font-weight: 600;
-}
-
-.helo-field__control {
+.helo-head__text {
 	min-width: 0;
 }
 
-.helo-hint {
-	margin: 6px 0 0;
-	color: var(--helo-muted);
-	font-size: 12px;
-	line-height: 1.6;
+.helo-head h1 {
+	font-size: 22px;
+	letter-spacing: -.01em;
 }
 
-.helo-hint code {
-	padding: 2px 6px;
-	background: var(--helo-subtle);
-	border: 1px solid var(--helo-border);
-	border-radius: 4px;
-	font-size: 11px;
+.helo-head p {
+	max-width: 68ch;
+	margin-top: 5px;
+	color: var(--helo-muted);
+	font-size: 13px;
+}
+
+.helo-head__aside {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+/* =============================================================== 3. layout */
+
+.helo-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--helo-gap);
+}
+
+.helo-grid {
+	display: grid;
+	gap: var(--helo-gap);
+}
+
+.helo-grid--2 {
+	grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.helo-grid--3 {
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .helo-row {
@@ -187,64 +157,233 @@
 	flex-wrap: wrap;
 }
 
-@media screen and (max-width: 782px) {
+.helo-spacer {
+	flex: 1 1 auto;
+}
+
+/* ================================================================ 4. card */
+
+.helo-card {
+	display: flex;
+	flex-direction: column;
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-line);
+	border-radius: var(--helo-r);
+	box-shadow: var(--helo-shadow);
+}
+
+.helo-card__head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	column-gap: 16px;
+	row-gap: 4px;
+	flex-wrap: wrap;
+	padding: var(--helo-pad);
+	border-bottom: 1px solid var(--helo-line);
+}
+
+.helo-card__head > div:first-child {
+	min-width: 0;
+}
+
+/*
+ * A head is either <div>title+text</div> + aside, which splits left/right, or
+ * a bare <h2> + <p>, which must stack. Giving the bare children a full-width
+ * basis makes one rule serve both instead of needing a modifier class.
+ */
+.helo-card__head > h2,
+.helo-card__head > h3,
+.helo-card__head > p {
+	flex: 1 0 100%;
+}
+
+.helo-card__head > p {
+	margin-top: 0;
+}
+
+.helo-card__head h2 {
+	font-size: 15px;
+}
+
+.helo-card__head h3 {
+	font-size: 14px;
+}
+
+.helo-card__head p {
+	max-width: 74ch;
+	margin-top: 4px;
+	color: var(--helo-muted);
+	font-size: 13px;
+}
+
+/* A head with nothing under it should not draw a divider. */
+.helo-card__head:last-child {
+	border-bottom: 0;
+}
+
+.helo-card__body {
+	padding: var(--helo-pad);
+}
+
+.helo-card__foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 14px;
+	flex-wrap: wrap;
+	margin-top: auto;
+	padding: 14px var(--helo-pad);
+	background: var(--helo-raised);
+	border-top: 1px solid var(--helo-line);
+	border-radius: 0 0 var(--helo-r) var(--helo-r);
+}
+
+.helo-card__foot p {
+	color: var(--helo-muted);
+	font-size: 12px;
+}
+
+/* =============================================================== 5. field */
+
+.helo-field {
+	display: grid;
+	grid-template-columns: 200px minmax(0, 1fr);
+	gap: 6px 22px;
+	padding: 16px var(--helo-pad);
+	border-top: 1px solid var(--helo-line);
+}
+
+.helo-card__head + .helo-field,
+.helo-card > form > .helo-field:first-child,
+.helo-field:first-child {
+	border-top: 0;
+}
+
+.helo-field__label {
+	padding-top: 8px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.helo-field__label small {
+	display: block;
+	margin-top: 2px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	font-weight: 400;
+}
+
+.helo-field__control {
+	min-width: 0;
+}
+
+.helo-hint {
+	max-width: 78ch;
+	margin-top: 7px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+.helo-hint code,
+.helo-code {
+	padding: 2px 6px;
+	background: var(--helo-raised);
+	border: 1px solid var(--helo-line);
+	border-radius: 5px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 11px;
+}
+
+@media screen and (max-width: 880px) {
 	.helo-field {
 		grid-template-columns: minmax(0, 1fr);
+		gap: 10px;
 	}
 
-	.helo-field > label:first-child,
 	.helo-field__label {
 		padding-top: 0;
 	}
 }
 
-/* --------------------------------------------------------------- controls */
+/* ============================================================ 6. controls */
 
 .helo-app input[type="text"],
 .helo-app input[type="email"],
+.helo-app input[type="url"],
 .helo-app input[type="number"],
 .helo-app input[type="password"],
 .helo-app input[type="search"],
-.helo-app select {
-	min-height: 34px;
-	padding: 4px 10px;
+.helo-app select,
+.helo-app textarea {
+	width: 100%;
+	max-width: 420px;
+	min-height: 36px;
+	padding: 6px 11px;
 	background: var(--helo-surface);
-	border: 1px solid var(--helo-border-strong);
-	border-radius: 6px;
+	border: 1px solid var(--helo-line-strong);
+	border-radius: var(--helo-r-sm);
 	box-shadow: none;
-	color: var(--helo-fg);
+	color: var(--helo-text);
 	font-size: 13px;
-	line-height: 1.6;
+	line-height: 1.5;
+	transition: border-color .12s ease, box-shadow .12s ease;
 }
 
-.helo-app input[type="text"],
-.helo-app input[type="email"],
-.helo-app input[type="password"],
-.helo-app select {
-	width: 100%;
-	max-width: 380px;
+.helo-app textarea {
+	min-height: 92px;
+	padding: 9px 11px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.7;
+	resize: vertical;
 }
 
 .helo-app input[type="number"] {
-	width: 90px;
+	width: 96px;
+	min-width: 96px;
+}
+
+.helo-app select {
+	max-width: 280px;
 }
 
 .helo-app input:focus,
-.helo-app select:focus {
+.helo-app select:focus,
+.helo-app textarea:focus {
 	border-color: var(--helo-accent);
-	box-shadow: 0 0 0 3px rgba(34, 113, 177, .16);
+	box-shadow: var(--helo-ring);
 	outline: none;
 }
 
-.helo-app input::placeholder {
-	color: #a7aaad;
+.helo-app input::placeholder,
+.helo-app textarea::placeholder {
+	color: var(--helo-faint);
 }
 
-/* Toggle switch, built on a real checkbox so the form still posts normally. */
+.helo-app input:disabled,
+.helo-app select:disabled,
+.helo-app textarea:disabled {
+	background: var(--helo-raised);
+	color: var(--helo-faint);
+	cursor: not-allowed;
+}
+
+.helo-input--wide {
+	max-width: 100%;
+}
+
+.helo-input--mono {
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 12px;
+}
+
+/* Switch — a real checkbox underneath, so forms post unchanged. */
 
 .helo-switch {
 	display: inline-flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 10px;
 	font-size: 13px;
 	line-height: 1.5;
@@ -258,11 +397,11 @@
 	flex: none;
 	width: 36px;
 	height: 20px;
-	margin: 0;
+	margin: 1px 0 0;
 	padding: 0;
-	background: var(--helo-border-strong);
+	background: var(--helo-line-strong);
 	border: 0;
-	border-radius: 999px;
+	border-radius: var(--helo-r-pill);
 	box-shadow: none;
 	transition: background .15s ease;
 	cursor: pointer;
@@ -278,7 +417,7 @@
 	margin: 0;
 	background: #fff;
 	border-radius: 50%;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+	box-shadow: 0 1px 2px rgba(17, 24, 39, .3);
 	transition: transform .15s ease;
 }
 
@@ -291,69 +430,92 @@
 }
 
 .helo-switch input[type="checkbox"]:focus-visible {
-	outline: 2px solid var(--helo-accent);
-	outline-offset: 2px;
+	outline: none;
+	box-shadow: var(--helo-ring);
 }
 
-/* ---------------------------------------------------------------- summary */
-
-.helo-summary {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-	margin-bottom: 20px;
-	background: var(--helo-surface);
-	border: 1px solid var(--helo-border);
-	border-radius: var(--helo-radius);
-	box-shadow: var(--helo-shadow);
-	overflow: hidden;
+.helo-switch input[type="checkbox"]:disabled {
+	opacity: .45;
+	cursor: not-allowed;
 }
 
-.helo-summary__cell {
-	padding: 16px 20px;
-	border-left: 1px solid var(--helo-border);
-}
-
-.helo-summary__cell:first-child {
-	border-left: 0;
-}
-
-.helo-summary__label {
+.helo-switch__text strong {
 	display: block;
-	margin-bottom: 6px;
-	color: var(--helo-muted);
-	font-size: 11px;
 	font-weight: 600;
-	letter-spacing: .04em;
-	text-transform: uppercase;
 }
 
-.helo-summary__value {
-	font-size: 15px;
-	font-weight: 600;
-	line-height: 1.4;
-	word-break: break-word;
-}
-
-.helo-summary__value--ok {
-	color: var(--helo-ok, #00a32a);
-}
-
-.helo-summary__value small {
+.helo-switch__text small {
+	display: block;
+	margin-top: 1px;
 	color: var(--helo-muted);
-	font-weight: 400;
+	font-size: 12px;
+	line-height: 1.55;
 }
 
-/* ----------------------------------------------------------------- badges */
+/* Choice cards — one labelled option per row. */
+
+.helo-choice {
+	display: grid;
+	max-width: 640px;
+	gap: 10px;
+}
+
+.helo-choice label {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 12px 14px;
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-line);
+	border-radius: var(--helo-r-sm);
+	cursor: pointer;
+	transition: border-color .12s ease, background .12s ease;
+}
+
+.helo-choice label:hover {
+	background: var(--helo-raised);
+	border-color: var(--helo-line-strong);
+}
+
+.helo-choice label:has(input:checked) {
+	background: var(--helo-accent-wash);
+	border-color: var(--helo-accent);
+}
+
+.helo-choice label:has(input:focus-visible) {
+	box-shadow: var(--helo-ring);
+}
+
+.helo-choice input[type="radio"] {
+	flex: none;
+	margin: 2px 0 0;
+}
+
+.helo-choice__text strong {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.helo-choice__text small {
+	display: block;
+	margin-top: 2px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	line-height: 1.55;
+}
+
+/* =============================================================== 7. badge */
 
 .helo-badge {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	padding: 2px 10px 2px 8px;
-	border-radius: 999px;
+	padding: 2px 10px 2px 9px;
+	border-radius: var(--helo-r-pill);
 	font-size: 12px;
 	font-weight: 600;
-	line-height: 20px;
+	line-height: 19px;
 	white-space: nowrap;
 }
 
@@ -365,38 +527,411 @@
 	background: currentColor;
 }
 
+.helo-badge--bare::before {
+	display: none;
+}
+
 .helo-badge--ok {
-	background: #edf7ee;
+	background: var(--helo-ok-wash);
 	color: var(--helo-ok);
-	box-shadow: inset 0 0 0 1px #b5ddbd;
+	box-shadow: inset 0 0 0 1px var(--helo-ok-line);
+}
+
+.helo-badge--warn {
+	background: var(--helo-warn-wash);
+	color: var(--helo-warn);
+	box-shadow: inset 0 0 0 1px var(--helo-warn-line);
 }
 
 .helo-badge--err {
-	background: #fcf0f1;
+	background: var(--helo-err-wash);
 	color: var(--helo-err);
-	box-shadow: inset 0 0 0 1px #ecc2c3;
+	box-shadow: inset 0 0 0 1px var(--helo-err-line);
 }
 
 .helo-badge--muted {
-	background: var(--helo-subtle);
+	background: var(--helo-raised);
 	color: var(--helo-muted);
-	box-shadow: inset 0 0 0 1px var(--helo-border);
+	box-shadow: inset 0 0 0 1px var(--helo-line);
 }
 
-/* ------------------------------------------------- split (mail client) */
+.helo-badge--accent {
+	background: var(--helo-accent-wash);
+	color: var(--helo-accent);
+	box-shadow: inset 0 0 0 1px var(--helo-accent-line);
+}
+
+/* =============================================================== 8. stats */
+
+.helo-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-line);
+	border-radius: var(--helo-r);
+	box-shadow: var(--helo-shadow);
+	overflow: hidden;
+}
+
+.helo-stat {
+	padding: 16px 20px 17px;
+	border-left: 1px solid var(--helo-line);
+}
+
+.helo-stat:first-child {
+	border-left: 0;
+}
+
+.helo-stat__label {
+	display: block;
+	margin-bottom: 7px;
+	color: var(--helo-muted);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+}
+
+.helo-stat__value {
+	display: flex;
+	align-items: baseline;
+	gap: 7px;
+	flex-wrap: wrap;
+	font-size: 22px;
+	font-weight: 600;
+	letter-spacing: -.02em;
+	line-height: 1.2;
+}
+
+.helo-stat__value small {
+	color: var(--helo-muted);
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0;
+}
+
+.helo-stat__value--sm {
+	font-size: 15px;
+	word-break: break-word;
+}
+
+.helo-stat__value--ok {
+	color: var(--helo-ok);
+}
+
+.helo-stat__value--err {
+	color: var(--helo-err);
+}
+
+.helo-stat__value a {
+	text-decoration: none;
+}
+
+/* Meter, under a stat or inside a table row. */
+
+.helo-meter {
+	position: relative;
+	height: 6px;
+	margin-top: 10px;
+	background: var(--helo-line);
+	border-radius: var(--helo-r-pill);
+	overflow: hidden;
+}
+
+.helo-meter__fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	background: var(--helo-ok);
+	border-radius: inherit;
+}
+
+.helo-meter__fill--err {
+	background: var(--helo-err);
+}
+
+.helo-meter__fill--accent {
+	background: var(--helo-accent);
+}
+
+.helo-meter--sm {
+	height: 5px;
+	margin-top: 6px;
+}
+
+/* ============================================================== 9. tables */
+
+.helo-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	font-size: 13px;
+}
+
+.helo-table th {
+	padding: 10px var(--helo-pad);
+	background: var(--helo-raised);
+	border-bottom: 1px solid var(--helo-line);
+	color: var(--helo-muted);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: .05em;
+	text-align: left;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.helo-table td {
+	padding: 12px var(--helo-pad);
+	border-top: 1px solid var(--helo-line);
+	vertical-align: middle;
+}
+
+.helo-table tbody tr:first-child td {
+	border-top: 0;
+}
+
+.helo-table tbody tr:hover td {
+	background: var(--helo-raised);
+}
+
+.helo-table__num,
+.helo-table th.helo-table__num {
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.helo-table__name {
+	font-weight: 600;
+}
+
+.helo-table__sub {
+	display: block;
+	margin-top: 2px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	font-weight: 400;
+}
+
+.helo-mono {
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 12px;
+}
+
+.helo-nowrap {
+	white-space: nowrap;
+}
+
+/* ============================================================= 10. alerts */
+
+.helo-alert {
+	display: flex;
+	align-items: flex-start;
+	gap: 11px;
+	padding: 13px 16px;
+	background: var(--helo-raised);
+	border: 1px solid var(--helo-line);
+	border-radius: var(--helo-r-sm);
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.helo-alert__icon {
+	flex: none;
+	margin-top: 1px;
+	font-size: 15px;
+	line-height: 1.2;
+}
+
+.helo-alert strong {
+	font-weight: 600;
+}
+
+.helo-alert--ok {
+	background: var(--helo-ok-wash);
+	border-color: var(--helo-ok-line);
+	color: #0b5c35;
+}
+
+.helo-alert--warn {
+	background: var(--helo-warn-wash);
+	border-color: var(--helo-warn-line);
+	color: #7a4805;
+}
+
+.helo-alert--err {
+	background: var(--helo-err-wash);
+	border-color: var(--helo-err-line);
+	color: #8f2424;
+}
+
+.helo-alert--info {
+	background: var(--helo-accent-wash);
+	border-color: var(--helo-accent-line);
+	color: #10466f;
+}
+
+.helo-alert a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+/* ======================================================== 11. empty state */
+
+.helo-empty {
+	padding: 54px 24px;
+	text-align: center;
+}
+
+.helo-empty .dashicons {
+	width: 38px;
+	height: 38px;
+	color: var(--helo-line-strong);
+	font-size: 38px;
+}
+
+.helo-empty h3 {
+	margin: 12px 0 4px;
+	font-size: 14px;
+}
+
+.helo-empty p {
+	max-width: 48ch;
+	margin: 0 auto;
+	color: var(--helo-muted);
+}
+
+.helo-empty__actions {
+	margin-top: 16px;
+}
+
+/* ================================================== 12. integration cards */
+
+.helo-group {
+	border-top: 1px solid var(--helo-line);
+}
+
+.helo-group:first-of-type {
+	border-top: 0;
+}
+
+.helo-group__head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 16px var(--helo-pad) 0;
+}
+
+.helo-group__head h3 {
+	font-size: 13px;
+}
+
+.helo-group__head p {
+	color: var(--helo-muted);
+	font-size: 12px;
+}
+
+.helo-integrations {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(276px, 1fr));
+	gap: 12px;
+	padding: 14px var(--helo-pad) var(--helo-pad);
+}
+
+.helo-int {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 13px 14px;
+	background: var(--helo-surface);
+	border: 1px solid var(--helo-line);
+	border-radius: var(--helo-r-sm);
+	cursor: pointer;
+	transition: border-color .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.helo-int:hover {
+	border-color: var(--helo-line-strong);
+	box-shadow: var(--helo-shadow);
+}
+
+.helo-int:has(input:checked) {
+	background: var(--helo-accent-wash);
+	border-color: var(--helo-accent-line);
+}
+
+.helo-int:has(input:focus-visible) {
+	box-shadow: var(--helo-ring);
+}
+
+.helo-int__body {
+	flex: 1;
+	min-width: 0;
+}
+
+.helo-int__name {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	flex-wrap: wrap;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.helo-int__note {
+	display: block;
+	margin-top: 2px;
+	color: var(--helo-muted);
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+/* Not installed: clearly secondary, still switchable. */
+.helo-int--absent {
+	background: var(--helo-raised);
+	border-style: dashed;
+}
+
+.helo-int--absent .helo-int__name {
+	color: var(--helo-muted);
+}
+
+.helo-tag {
+	padding: 1px 7px;
+	border-radius: var(--helo-r-pill);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.helo-tag--on {
+	background: var(--helo-ok-wash);
+	color: var(--helo-ok);
+	box-shadow: inset 0 0 0 1px var(--helo-ok-line);
+}
+
+.helo-tag--off {
+	background: #eef0f3;
+	color: var(--helo-muted);
+}
+
+/* ============================================ 13. split (mail client view) */
 
 .helo-split {
 	--helo-split-height: clamp(520px, calc(100vh - 300px), 940px);
 
 	display: grid;
 	grid-template-columns: 340px minmax(0, 1fr);
+	overflow: hidden;
 }
 
 .helo-split__list {
 	height: var(--helo-split-height);
 	overflow-y: auto;
-	border-right: 1px solid var(--helo-border);
-	background: var(--helo-subtle);
+	background: var(--helo-raised);
+	border-right: 1px solid var(--helo-line);
 }
 
 .helo-split__pane {
@@ -412,9 +947,9 @@
 
 	.helo-split__list {
 		height: auto;
-		max-height: 340px;
+		max-height: 320px;
 		border-right: 0;
-		border-bottom: 1px solid var(--helo-border);
+		border-bottom: 1px solid var(--helo-line);
 	}
 
 	.helo-split__pane {
@@ -422,19 +957,17 @@
 	}
 }
 
-/* ------------------------------------------------------------ message rows */
-
 .helo-msg {
 	display: block;
 	padding: 11px 16px 12px;
-	border-bottom: 1px solid var(--helo-border);
+	border-bottom: 1px solid var(--helo-line);
 	border-left: 3px solid transparent;
 	color: inherit;
 	text-decoration: none;
 }
 
 .helo-msg:hover {
-	background: #fff;
+	background: var(--helo-surface);
 	color: inherit;
 }
 
@@ -490,14 +1023,14 @@
 }
 
 .helo-dot--ok {
-	background: #b5ddbd;
+	background: var(--helo-ok-line);
 }
 
 .helo-dot--err {
 	background: var(--helo-err);
 }
 
-/* ----------------------------------------------------------- reading pane */
+/* ====================================================== 14. message reader */
 
 .helo-reader__head {
 	display: flex;
@@ -505,8 +1038,8 @@
 	justify-content: space-between;
 	gap: 16px;
 	flex-wrap: wrap;
-	padding: 18px 24px;
-	border-bottom: 1px solid var(--helo-border);
+	padding: 18px var(--helo-pad);
+	border-bottom: 1px solid var(--helo-line);
 }
 
 .helo-reader__title {
@@ -514,78 +1047,15 @@
 }
 
 .helo-reader__head h2 {
-	margin: 0;
-	padding: 0;
 	font-size: 15px;
-	font-weight: 600;
-	line-height: 1.4;
 	word-break: break-word;
 }
 
 .helo-reader__head p {
-	margin: 4px 0 0;
+	margin-top: 4px;
 	color: var(--helo-muted);
 	font-size: 12px;
 }
-
-.helo-mono {
-	font-family: Menlo, Consolas, monaco, monospace;
-	font-size: 12px;
-}
-
-/* ------------------------------------------------------------- empty state */
-
-.helo-empty {
-	padding: 56px 24px;
-	text-align: center;
-}
-
-.helo-empty .dashicons {
-	width: 40px;
-	height: 40px;
-	color: var(--helo-border-strong);
-	font-size: 40px;
-}
-
-.helo-empty h3 {
-	margin: 12px 0 4px;
-	font-size: 14px;
-	font-weight: 600;
-}
-
-.helo-empty p {
-	margin: 0;
-	color: var(--helo-muted);
-	font-size: 13px;
-}
-
-/* -------------------------------------------------------------- toolbars */
-
-.helo-toolbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	flex-wrap: wrap;
-	margin-bottom: 16px;
-}
-
-.helo-search {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.helo-search input[type="search"] {
-	width: 280px;
-}
-
-.helo-result-count {
-	color: var(--helo-muted);
-	font-size: 13px;
-}
-
-/* --------------------------------------------------------- message detail */
 
 .helo-meta {
 	display: grid;
@@ -593,8 +1063,8 @@
 }
 
 .helo-meta dt {
-	padding: 12px 0 12px 24px;
-	border-top: 1px solid var(--helo-border);
+	padding: 12px 0 12px var(--helo-pad);
+	border-top: 1px solid var(--helo-line);
 	color: var(--helo-muted);
 	font-size: 12px;
 	font-weight: 600;
@@ -602,8 +1072,8 @@
 
 .helo-meta dd {
 	margin: 0;
-	padding: 12px 24px 12px 0;
-	border-top: 1px solid var(--helo-border);
+	padding: 12px var(--helo-pad) 12px 0;
+	border-top: 1px solid var(--helo-line);
 	font-size: 13px;
 	word-break: break-word;
 }
@@ -615,7 +1085,7 @@
 
 .helo-meta pre {
 	margin: 0;
-	font-family: Menlo, Consolas, monaco, monospace;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
 	font-size: 12px;
 	line-height: 1.6;
 	white-space: pre-wrap;
@@ -625,51 +1095,49 @@
 .helo-error-box {
 	margin: 8px 0 0;
 	padding: 10px 12px;
-	background: #fcf0f1;
-	border: 1px solid #ecc2c3;
-	border-radius: 6px;
+	background: var(--helo-err-wash);
+	border: 1px solid var(--helo-err-line);
+	border-radius: var(--helo-r-sm);
 	color: var(--helo-err);
-	font-family: Menlo, Consolas, monaco, monospace;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
 	font-size: 12px;
 	line-height: 1.6;
 	white-space: pre-wrap;
 }
 
-/* ---------------------------------------------------------------- preview */
+/* ============================================================ 15. preview */
 
 .helo-preview__bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	padding: 12px 24px;
-	border-bottom: 1px solid var(--helo-border);
+	padding: 12px var(--helo-pad);
+	border-bottom: 1px solid var(--helo-line);
 	color: var(--helo-muted);
 	font-size: 11px;
 	font-weight: 600;
-	letter-spacing: .04em;
+	letter-spacing: .05em;
 	text-transform: uppercase;
 }
 
 .helo-preview__stage {
-	padding: 24px;
-	background: repeating-conic-gradient(#f0f0f1 0% 25%, #f6f7f7 0% 50%) 50% / 16px 16px;
+	padding: 22px;
+	background: repeating-conic-gradient(var(--helo-line) 0% 25%, var(--helo-raised) 0% 50%) 50% / 16px 16px;
 }
 
 .helo-preview__frame {
+	display: block;
 	width: 100%;
 	max-width: 100%;
 	height: 560px;
 	margin: 0 auto;
-	display: block;
 	background: #fff;
-	border: 1px solid var(--helo-border-strong);
-	border-radius: 6px;
-	box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+	border: 1px solid var(--helo-line-strong);
+	border-radius: var(--helo-r-sm);
+	box-shadow: var(--helo-shadow-md);
 	transition: max-width .2s ease;
 }
-
-/* Width switcher: pure CSS, the radios live just before the stage. */
 
 .helo-vis {
 	position: absolute;
@@ -680,16 +1148,17 @@
 .helo-seg {
 	display: inline-flex;
 	padding: 3px;
-	background: #f0f0f1;
-	border-radius: 6px;
+	background: #eef0f3;
+	border-radius: var(--helo-r-sm);
 }
 
 .helo-seg label {
 	padding: 4px 12px;
 	border-radius: 4px;
 	color: var(--helo-muted);
-	font-size: 12px;
-	font-weight: 500;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: .03em;
 	cursor: pointer;
 	user-select: none;
 }
@@ -697,8 +1166,7 @@
 #helo-width-desktop:checked ~ .helo-preview .helo-seg label[for="helo-width-desktop"],
 #helo-width-mobile:checked ~ .helo-preview .helo-seg label[for="helo-width-mobile"] {
 	background: var(--helo-surface);
-	color: var(--helo-fg);
-	font-weight: 600;
+	color: var(--helo-text);
 	box-shadow: var(--helo-shadow);
 }
 
@@ -706,7 +1174,6 @@
 	max-width: 390px;
 }
 
-/* The radios are visually hidden but still tabbable, so mirror focus onto the label. */
 #helo-width-desktop:focus-visible ~ .helo-preview .helo-seg label[for="helo-width-desktop"],
 #helo-width-mobile:focus-visible ~ .helo-preview .helo-seg label[for="helo-width-mobile"] {
 	outline: 2px solid var(--helo-accent);
@@ -714,11 +1181,11 @@
 }
 
 .helo-source {
-	border-top: 1px solid var(--helo-border);
+	border-top: 1px solid var(--helo-line);
 }
 
 .helo-source summary {
-	padding: 12px 24px;
+	padding: 12px var(--helo-pad);
 	color: var(--helo-muted);
 	font-size: 12px;
 	font-weight: 600;
@@ -744,9 +1211,9 @@
 .helo-source pre {
 	max-height: 420px;
 	margin: 0;
-	padding: 0 24px 20px;
+	padding: 0 var(--helo-pad) 20px;
 	overflow: auto;
-	font-family: Menlo, Consolas, monaco, monospace;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
 	font-size: 12px;
 	line-height: 1.6;
 	white-space: pre-wrap;
@@ -755,21 +1222,52 @@
 
 .helo-plain {
 	margin: 0;
-	padding: 24px;
-	font-family: Menlo, Consolas, monaco, monospace;
+	padding: var(--helo-pad);
+	font-family: ui-monospace, Menlo, Consolas, monospace;
 	font-size: 13px;
 	line-height: 1.7;
 	white-space: pre-wrap;
 	word-break: break-word;
 }
 
-/* ------------------------------------------------------------- pagination */
+/* ======================================================== 16. toolbar/nav */
+
+.helo-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+
+.helo-search {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.helo-search input[type="search"] {
+	width: 300px;
+	max-width: 300px;
+}
+
+.helo-count {
+	color: var(--helo-muted);
+	font-size: 13px;
+}
 
 .helo-pagination {
 	display: flex;
 	justify-content: flex-end;
 	gap: 4px;
-	margin-top: 16px;
+	margin-top: 14px;
+}
+
+.helo-pagination--list {
+	justify-content: center;
+	margin-top: 0;
+	padding: 12px;
 }
 
 .helo-pagination .page-numbers {
@@ -778,17 +1276,17 @@
 	justify-content: center;
 	min-width: 32px;
 	height: 32px;
-	padding: 0 8px;
+	padding: 0 9px;
 	background: var(--helo-surface);
-	border: 1px solid var(--helo-border);
-	border-radius: 6px;
-	color: var(--helo-fg);
+	border: 1px solid var(--helo-line);
+	border-radius: var(--helo-r-sm);
+	color: var(--helo-text);
 	font-size: 13px;
 	text-decoration: none;
 }
 
 .helo-pagination .page-numbers:hover {
-	background: var(--helo-subtle);
+	background: var(--helo-raised);
 }
 
 .helo-pagination .page-numbers.current {
@@ -799,19 +1297,43 @@
 }
 
 .helo-pagination .page-numbers.dots {
-	border-color: transparent;
 	background: none;
+	border-color: transparent;
 }
 
-/* ---------------------------------------------------------------- notices */
+/* ============================================================ 17. notices */
 
-.helo-app > .notice {
-	margin: 0 0 20px;
-	border-radius: 6px;
+.helo-app > .notice,
+.helo-app > .notice.is-dismissible {
+	margin: 0 0 var(--helo-gap);
+	border-radius: var(--helo-r-sm);
+	box-shadow: var(--helo-shadow);
 }
 
-.helo-pagination--list {
-	justify-content: center;
-	padding: 12px;
-	margin-top: 0;
+/* ========================================================== 18. utilities */
+
+.helo-muted {
+	color: var(--helo-muted);
+}
+
+.helo-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	white-space: nowrap;
+}
+
+/* Beats `.helo-app a`, which would otherwise paint a danger link blue. */
+.helo-app .helo-danger,
+.helo-app a.helo-danger {
+	color: var(--helo-err);
+}
+
+.helo-link-list {
+	display: flex;
+	gap: 18px;
+	flex-wrap: wrap;
+	font-size: 13px;
 }

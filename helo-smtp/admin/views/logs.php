@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
 		<?php endif; ?>
 	</form>
 
-	<span class="helo-result-count">
+	<span class="helo-count">
 		<?php
 		printf(
 			/* translators: %s: number of emails. */

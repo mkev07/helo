@@ -40,6 +40,14 @@ function wp_parse_args( $args, $defaults ) {
 	return array_merge( $defaults, (array) $args );
 }
 
+function __( $t, $d = null ) {
+	return $t;
+}
+function wp_list_pluck( $list, $field ) {
+	return array_map( function ( $i ) use ( $field ) { return $i[ $field ]; }, $list );
+}
+
+require_once dirname( __DIR__ ) . '/includes/class-helo-integrations.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-settings.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-imap.php';
 

@@ -4,7 +4,7 @@ Tags: smtp, email, mail, log, wp_mail
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,17 @@ Deleting the old plugin before activating Helo drops the log table and the
 settings, and there is no recovering them.
 
 == Changelog ==
+
+= 2.0.0 =
+* Rebuilt the admin interface on a single design system — cards, stat tiles, meters and one consistent focus ring.
+* Protected forms are now grouped cards that show which plugins are actually installed, instead of a wall of toggles.
+* Security log is fully styled, with per-form pass-rate meters and plain-English explanations of each Cloudflare error code.
+* New: exemptions — signed-in users, an IP allowlist with CIDR support, and a user-agent allowlist. Comments are never exempt.
+* New: failsafe — choose whether submissions are allowed or blocked when Cloudflare cannot be reached. A rejected key is not treated as an outage.
+* New: Turnstile keys can be set in wp-config.php with HELO_TURNSTILE_SITE_KEY and HELO_TURNSTILE_SECRET_KEY.
+* New: widget size, language and label are configurable, the submit-button hold can be switched off, and the failure message can be customised.
+* Integrations now come from one registry, so a setting, its sanitiser and its admin row can no longer drift apart.
+
 
 = 1.7.0 =
 * New: Turnstile now auto-protects Elementor Pro forms, in addition to the other form builders.

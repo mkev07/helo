@@ -15,7 +15,7 @@ Helo fixes both halves. It routes everything through your own SMTP server, logs
 every message with its full body, and gives you a mail-client view to read,
 resend, and diagnose what went out.
 
-![The email log](docs/log.png)
+![The Helo dashboard](docs/dashboard.png)
 
 ---
 
@@ -53,18 +53,29 @@ up in your normal mail client alongside everything else.
 - **Never blocks or fails a send.** The mail has already gone out by the time this runs.
 - Off by default, since it adds one IMAP round trip.
 
-### Bot & spam protection
+### Bot protection
 
-Protect your site's forms from bots with Cloudflare Turnstile — the privacy-friendly
-CAPTCHA that keeps the signal about whether someone is human on the visitor's device,
-so no cookies or visitor data cross over to your server.
+Cloudflare Turnstile on your forms — the CAPTCHA that keeps the human check on
+the visitor's device, so no cookies or visitor data reach your server.
 
-- One settings screen for your **site key** and **secret key**, plus theme and when the widget shows.
-- Protects **login, registration, lost-password, comments, WooCommerce, and Contact Form 7** forms.
-- **Comments are blocked with no exceptions** when the feature is on and keys are set.
-- A **Security screen** shows how it's going: verified vs blocked totals, a per-form breakdown, and the top block reasons.
-- **Turnstile tokens are single-use** and verified on the server (with the visitor's IP), so a captured token can't be replayed.
-- The optional **debug log** (off by default) records the IP and page behind each blocked check for troubleshooting.
+- Guards **login, registration, lost password, comments, WooCommerce** and **ten form builders** — Contact Form 7, WPForms, Forminator, Fluent Forms, Formidable, Gravity Forms, Jetpack, Kadence, SureForms and Elementor Pro.
+- Each one is a card that tells you **whether that plugin is actually installed**, so you are not guessing at a list of names.
+- **Tokens are single-use** and verified server-side with the visitor's IP, so a captured token can't be replayed.
+- **Comments are blocked with no exceptions** — no logged-in or role exemption, ever.
+- **Exemptions** for everything else: signed-in users, an IP allowlist with CIDR ranges, and a user-agent allowlist for uptime monitors.
+- **Failsafe** — decide whether submissions are allowed or blocked when Cloudflare itself is unreachable. A rejected key is never mistaken for an outage.
+- Keys can live in `wp-config.php` via `HELO_TURNSTILE_SITE_KEY` / `HELO_TURNSTILE_SECRET_KEY`, so staging and production differ without touching the database.
+- Widget **theme, size, language and label** are configurable, as is the failure message.
+
+![Bot protection](docs/security.png)
+
+### Security log
+
+- Verified vs blocked totals, with a **pass rate per form** — a low rate means bots found that form, not that visitors are struggling.
+- Every Cloudflare error code is translated into **plain English** instead of leaving you to search `timeout-or-duplicate`.
+- An optional **debug log** (off by default) records the IP and page behind the last 50 checks.
+
+![Security log](docs/security-log.png)
 
 ### Updates
 
@@ -75,9 +86,11 @@ listed on wordpress.org. See [Releasing](#releasing).
 
 ## Screenshots
 
-| Settings | Reading a failed message |
+| Email log | Reading a message |
 |---|---|
-| ![Settings](docs/settings.png) | ![Message](docs/message.png) |
+| ![Email log](docs/log.png) | ![Message](docs/message.png) |
+
+![Mail settings](docs/settings.png)
 
 ---
 
@@ -145,9 +158,8 @@ header doesn't match the repo, and won't publish from a dirty or unpushed tree.
 ## Development
 
 ```bash
-php helo-smtp/tests/test-settings.php   # password encryption, sanitising
-php helo-smtp/tests/test-imap.php       # IMAP protocol, against a fake server
-./build.sh                              # build the zip
+for t in helo-smtp/tests/test-*.php; do php "$t"; done   # the whole suite
+./build.sh                                               # build the zip
 ```
 
 No framework — plain `assert()` scripts, excluded from the released zip.
@@ -166,11 +178,16 @@ helo-smtp/
 ├── helo-smtp.php               header, constants, wiring
 ├── uninstall.php               removes table + options on delete
 ├── includes/
-│   ├── class-helo-settings.php defaults, sanitising, password encryption
-│   ├── class-helo-mailer.php   phpmailer_init, From override, test, resend
-│   ├── class-helo-logger.php   schema, record, query, retention cron
-│   ├── class-helo-imap.php     Sent-folder copy over raw IMAP
-│   └── class-helo-updater.php  self-hosted updates
+│   ├── class-helo-settings.php      defaults, sanitising, password encryption
+│   ├── class-helo-integrations.php  registry of everything Turnstile can guard
+│   ├── class-helo-mailer.php        phpmailer_init, From override, test, resend
+│   ├── class-helo-logger.php        schema, record, query, retention cron
+│   ├── class-helo-imap.php          Sent-folder copy over raw IMAP
+│   ├── class-helo-turnstile.php     widget, verification, core forms
+│   ├── class-helo-exemptions.php    who skips the check, IP/CIDR matching
+│   ├── class-helo-form-integrations.php  form-builder wiring
+│   ├── class-helo-analytics.php     counters and the debug log
+│   └── class-helo-updater.php       self-hosted updates
 ├── admin/
 │   ├── class-helo-admin.php    menu, routing, form handlers
 │   ├── css/admin.css

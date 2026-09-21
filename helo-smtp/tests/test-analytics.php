@@ -71,7 +71,25 @@ function current_user_can( $cap ) {
 	return true;
 }
 
+function is_user_logged_in(  ) {
+	return false;
+}
+function apply_filters( $t, $v ) {
+	return $v;
+}
+function wp_validate_auth_cookie( $c = '', $s = '' ) {
+	return false;
+}
+function __( $t, $d = null ) {
+	return $t;
+}
+function wp_list_pluck( $list, $field ) {
+	return array_map( function ( $i ) use ( $field ) { return $i[ $field ]; }, $list );
+}
+
+require_once dirname( __DIR__ ) . '/includes/class-helo-integrations.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-settings.php';
+require_once dirname( __DIR__ ) . '/includes/class-helo-exemptions.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-turnstile.php';
 require_once dirname( __DIR__ ) . '/includes/class-helo-analytics.php';
 

@@ -24,10 +24,43 @@ class Helo_Turnstile {
 		add_action( 'init', array( __CLASS__, 'wire' ), 20 );
 	}
 
+	/**
+	 * The site key, from wp-config.php when defined.
+	 *
+	 * Keys in a constant survive a database restore and keep staging from
+	 * inheriting production's keys.
+	 *
+	 * @return string
+	 */
+	public static function site_key() {
+		if ( defined( 'HELO_TURNSTILE_SITE_KEY' ) && HELO_TURNSTILE_SITE_KEY ) {
+			return (string) HELO_TURNSTILE_SITE_KEY;
+		}
+
+		return (string) Helo_Settings::get( 'turnstile_site_key' );
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function secret_key() {
+		if ( defined( 'HELO_TURNSTILE_SECRET_KEY' ) && HELO_TURNSTILE_SECRET_KEY ) {
+			return (string) HELO_TURNSTILE_SECRET_KEY;
+		}
+
+		return (string) Helo_Settings::get( 'turnstile_secret_key' );
+	}
+
+	/** True when either key is pinned in wp-config.php. */
+	public static function keys_locked() {
+		return ( defined( 'HELO_TURNSTILE_SITE_KEY' ) && HELO_TURNSTILE_SITE_KEY )
+			|| ( defined( 'HELO_TURNSTILE_SECRET_KEY' ) && HELO_TURNSTILE_SECRET_KEY );
+	}
+
 	public static function enabled() {
 		return Helo_Settings::get( 'turnstile_enable' )
-			&& '' !== Helo_Settings::get( 'turnstile_site_key' )
-			&& '' !== Helo_Settings::get( 'turnstile_secret_key' );
+			&& '' !== self::site_key()
+			&& '' !== self::secret_key();
 	}
 
 	public static function wire() {
@@ -126,23 +159,36 @@ class Helo_Turnstile {
 			return;
 		}
 
+		// Nothing to solve if this visitor is exempt anyway.
+		if ( Helo_Exemptions::applies( $form_action ) ) {
+			return;
+		}
+
 		// A stable per-location prefix plus a random tail, so two widgets on the
 		// same page (shortcode + form, etc.) never collide in the render queue.
-		$id = '-h' . ( $unique_id !== '' ? $unique_id : 'w' ) . '-' . wp_rand();
+		$id    = '-h' . ( $unique_id !== '' ? $unique_id : 'w' ) . '-' . wp_rand();
+		$label = (string) Helo_Settings::get( 'turnstile_label' );
+
+		if ( '' !== $label ) :
+			?><p class="cf-turnstile-label"><?php echo esc_html( $label ); ?></p><?php
+		endif;
 
 		?><div id="cf-turnstile<?php echo esc_attr( $id ); ?>"
 		class="cf-turnstile"
-		data-sitekey="<?php echo esc_attr( Helo_Settings::get( 'turnstile_site_key' ) ); ?>"
+		data-sitekey="<?php echo esc_attr( self::site_key() ); ?>"
 		data-theme="<?php echo esc_attr( Helo_Settings::get( 'turnstile_theme' ) ); ?>"
-		data-language="auto"
-		data-size="normal"
+		data-language="<?php echo esc_attr( Helo_Settings::get( 'turnstile_language' ) ); ?>"
+		data-size="<?php echo esc_attr( Helo_Settings::get( 'turnstile_size' ) ); ?>"
 		data-retry="auto" data-retry-interval="1000"
 		data-refresh-expired="auto"
 		data-refresh-timeout="auto"
 		data-action="<?php echo esc_attr( $form_action ); ?>"
 		data-appearance="<?php echo esc_attr( Helo_Settings::get( 'turnstile_appearance' ) ); ?>"></div>
 		<?php
-		if ( $button_id ) : ?>
+		// Holding the submit button until a token exists stops the "nothing
+		// happened" double-click, but it breaks any form whose button is also
+		// the thing that reveals the widget — hence the opt-out.
+		if ( $button_id && Helo_Settings::get( 'turnstile_hold_submit' ) ) : ?>
 			<style><?php echo esc_html( $button_id ); ?> { pointer-events: none; opacity: 0.5; }</style>
 		<?php endif;
 
@@ -227,6 +273,15 @@ class Helo_Turnstile {
 		if ( ! self::enabled() ) {
 			return $results;
 		}
+
+		// Exempt visitors never spend a token and never reach Cloudflare.
+		if ( Helo_Exemptions::applies( $form_action ) ) {
+			$results['success']    = true;
+			$results['error_code'] = 'exempt';
+
+			return $results;
+		}
+
 		if ( '' === $token && ! empty( $_POST['cf-turnstile-response'] ) ) {
 			$token = sanitize_text_field( $_POST['cf-turnstile-response'] );
 		}
@@ -244,15 +299,29 @@ class Helo_Turnstile {
 			array(
 				'timeout' => 15,
 				'body'    => array(
-					'secret'   => Helo_Settings::get( 'turnstile_secret_key' ),
+					'secret'   => self::secret_key(),
 					'response' => $token,
-					'remoteip' => self::remote_ip(),
+					'remoteip' => Helo_Exemptions::remote_ip(),
 				),
 			)
 		);
 
-		$body = is_wp_error( $response ) ? '' : wp_remote_retrieve_body( $response );
-		$json = json_decode( $body, true );
+		// Cloudflare unreachable, or answering 5xx: this is an outage, not a
+		// bot. Whether that opens the gate is the administrator's call.
+		if ( self::unreachable( $response ) ) {
+			$results['error_code'] = 'cloudflare-unreachable';
+
+			if ( 'allow' === Helo_Settings::get( 'turnstile_failsafe' ) ) {
+				$results['success'] = true;
+				self::set_verified( '_verify', $token, self::VERIFY_CACHE );
+			}
+
+			do_action( 'helo_turnstile_after_check', null, $results, $form_action );
+
+			return $results;
+		}
+
+		$json = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( is_array( $json ) ) {
 			$success = ! empty( $json['success'] );
@@ -270,24 +339,31 @@ class Helo_Turnstile {
 		return $results;
 	}
 
-	/** The visitor IP, honouring the common proxy headers Cloudflare sets. */
+	/**
+	 * Did the siteverify call fail to reach a working Cloudflare?
+	 *
+	 * A 4xx is Cloudflare answering — usually a bad secret — and must not be
+	 * treated as an outage, or a wrong key would silently disable protection.
+	 *
+	 * @param array|WP_Error $response Result of wp_remote_post().
+	 * @return bool
+	 */
+	public static function unreachable( $response ) {
+		if ( is_wp_error( $response ) ) {
+			return true;
+		}
+
+		return (int) wp_remote_retrieve_response_code( $response ) >= 500;
+	}
+
+	/**
+	 * The visitor IP. Kept as a thin alias so existing callers and the
+	 * analytics log keep working.
+	 *
+	 * @return string
+	 */
 	public static function remote_ip() {
-		$ip = '';
-
-		foreach ( array( 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ) as $key ) {
-			$header = isset( $_SERVER[ $key ] ) ? sanitize_text_field( $_SERVER[ $key ] ) : '';
-			if ( $header ) {
-				$ip = $header;
-				break;
-			}
-		}
-
-		// X-Forwarded-For can carry a comma-separated chain; take the first.
-		if ( false !== strpos( $ip, ',' ) ) {
-			$ip = trim( explode( ',', $ip )[0] );
-		}
-
-		return $ip;
+		return Helo_Exemptions::remote_ip();
 	}
 
 	/* -------------------------------------------------------- shortcode + msg */
@@ -302,8 +378,45 @@ class Helo_Turnstile {
 		return $html;
 	}
 
+	/**
+	 * What a visitor sees when the check fails.
+	 *
+	 * @return string
+	 */
 	public static function failed_message() {
+		$custom = trim( (string) Helo_Settings::get( 'turnstile_message' ) );
+
+		if ( '' !== $custom ) {
+			return esc_html( $custom );
+		}
+
 		return esc_html__( 'Failed to verify you are human. Please try again.', 'helo-smtp' );
+	}
+
+	/**
+	 * Plain-English rendering of a Cloudflare error code, for the admin log.
+	 *
+	 * Pure — tested.
+	 *
+	 * @param string $code Error code from siteverify.
+	 * @return string
+	 */
+	public static function explain( $code ) {
+		$map = array(
+			'missing-input-secret'   => __( 'No secret key was sent.', 'helo-smtp' ),
+			'invalid-input-secret'   => __( 'Cloudflare rejected the secret key — check it on the Bot protection screen.', 'helo-smtp' ),
+			'missing-input-response' => __( 'The form was submitted without a token, usually a bot posting directly.', 'helo-smtp' ),
+			'invalid-input-response' => __( 'The token was malformed or not issued for this site.', 'helo-smtp' ),
+			'timeout-or-duplicate'   => __( 'The token had already been used or had expired — often a genuine visitor resubmitting.', 'helo-smtp' ),
+			'bad-request'            => __( 'Cloudflare could not read the request.', 'helo-smtp' ),
+			'internal-error'         => __( 'Cloudflare had an internal error. Retrying usually works.', 'helo-smtp' ),
+			'cloudflare-unreachable' => __( 'Cloudflare could not be reached, so the failsafe setting decided the outcome.', 'helo-smtp' ),
+			'exempt'                 => __( 'Skipped: this visitor matched an exemption rule.', 'helo-smtp' ),
+		);
+
+		$code = (string) $code;
+
+		return isset( $map[ $code ] ) ? $map[ $code ] : $code;
 	}
 
 	/* ------------------------------------------------------------ core forms */
